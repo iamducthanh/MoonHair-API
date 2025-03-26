@@ -57,6 +57,9 @@ const Employee = React.lazy(() => import('./views/system/employee/Employee'))
 const EmployeeAdd = React.lazy(() => import('./views/system/employee/EmployeeAdd'))
 const EmployeeEdit = React.lazy(() => import('./views/system/employee/EmployeeEdit'))
 
+// product
+const ProductList = React.lazy(() => import('./views/product/Product'))
+
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 const routes = [
@@ -113,6 +116,9 @@ const routes = [
   { path: '/system/employee', name: 'Nhân viên', element: Employee },
   { path: '/system/employee/add', name: 'Thêm nhân viên', element: EmployeeAdd },
   { path: '/system/employee/:id', name: 'Sửa nhân viên', element: EmployeeEdit },
+
+  // product
+  { path: '/product/list', name: 'Sản phẩm', element: ProductList },
 
 ]
 

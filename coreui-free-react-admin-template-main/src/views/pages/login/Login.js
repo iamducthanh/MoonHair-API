@@ -34,19 +34,15 @@ const Login = () => {
         username,
         password,
       })
-
-      console.log('Đăng nhập thành công');
       
       // Lưu token vào localStorage
       localStorage.setItem('accessToken', response.data.token)
-      console.log(localStorage.getItem('accessToken'));
-      
-
+    
 
       // Chuyển hướng đến trang Dashboard hoặc Home
       navigate('/dashboard')
     } catch (error) {
-      setError('Login failed. Please check your username and password.')
+      setError('Đăng nhập thất bại. Vui lòng kiểm tra lại tên đăng nhập và mật khẩu!')
     }
   }
 
@@ -59,8 +55,8 @@ const Login = () => {
               <CCard className="p-4">
                 <CCardBody>
                   <CForm onSubmit={handleLogin}>
-                    <h1>Login</h1>
-                    <p className="text-body-secondary">Sign In to your account</p>
+                    <h1>Đăng nhập</h1>
+                    <p className="text-body-secondary">Nhập thông tin tài khoản của bạn</p>
 
                     {error && <CAlert color="danger">{error}</CAlert>}
 
@@ -92,12 +88,7 @@ const Login = () => {
                     <CRow>
                       <CCol xs={6}>
                         <CButton type="submit" color="primary" className="px-4">
-                          Login
-                        </CButton>
-                      </CCol>
-                      <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0">
-                          Forgot password?
+                          Đăng nhập
                         </CButton>
                       </CCol>
                     </CRow>

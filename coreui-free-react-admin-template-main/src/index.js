@@ -6,8 +6,13 @@ import 'core-js'
 import App from './App'
 import store from './store'
 
+import { AppProvider } from './context/AppContext';
+
+
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
-    <App />
+    <AppProvider>
+      <App />
+    </AppProvider>
   </Provider>,
 )
