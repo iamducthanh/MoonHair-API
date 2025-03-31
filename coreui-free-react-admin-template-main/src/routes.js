@@ -60,6 +60,9 @@ const EmployeeEdit = React.lazy(() => import('./views/system/employee/EmployeeEd
 // product
 const ProductList = React.lazy(() => import('./views/product/Product'))
 
+// transaction
+const PurchaseOrderList = React.lazy(() => import('./views/transaction/purchaseOrder/PurchaseOrderList'))
+
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 const routes = [
@@ -119,6 +122,9 @@ const routes = [
 
   // product
   { path: '/product/list', name: 'Sản phẩm', element: ProductList },
+
+  // transaction
+  { path: '/transaction/purchaseOrder', name: 'Nhập hàng', element: PurchaseOrderList },
 
 ]
 

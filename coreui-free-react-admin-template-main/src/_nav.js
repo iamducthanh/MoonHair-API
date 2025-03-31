@@ -80,6 +80,19 @@ const _nav = [
   },
   {
     component: CNavGroup,
+    name: 'Giao dịch',
+    to: '/transaction',
+    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Nhập hàng',
+        to: '/transaction/purchaseOrder',
+      }
+    ],
+  },
+  {
+    component: CNavGroup,
     name: 'Base',
     to: '/base',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
