@@ -5,6 +5,8 @@ import com.moonhair.moonhair.dto.ProductRequest;
 import com.moonhair.moonhair.entities.ProductEntity;
 import com.moonhair.moonhair.repositories.ProductRepository;
 import com.moonhair.moonhair.service.IProductService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,4 +60,10 @@ public class ProductServiceImpl implements IProductService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
         sp.setDeleteFlag(true);
         return productRepository.save(sp);       }
+
+    @Override
+    public List<ProductEntity> searchProduct(String key) {
+        Pageable topTen = PageRequest.of(0, 10); // Page 0, size 10
+        return productRepository.searchByKeyword(key, topTen);
+    }
 }

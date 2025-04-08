@@ -39,6 +39,7 @@ const AppHeader = () => {
 
   const [branches, setBranches] = useState([]);
   const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
+  const { selectedBranchLocalName, setSelectedBranchLocalName } = useAppContext();
 
   useEffect(() => {
     document.addEventListener('scroll', () => {
@@ -54,6 +55,7 @@ const AppHeader = () => {
         setBranches(response.data);
         if (response.data.length > 0) {
           setSelectedBranchLocal(response.data[0].id);
+          setSelectedBranchLocalName(response.data[0].name);
         }
       } catch (error) {
       }
@@ -61,7 +63,11 @@ const AppHeader = () => {
     fetchBranches();
   }, []);
   const handleBranchChange = (e) => {
-    setSelectedBranchLocal(e.target.value);
+    const [id, name] = e.target.value.split('%');
+    setSelectedBranchLocal(id);
+    setSelectedBranchLocalName(name);
+
+    console.log(e.target)
   };
 
   return (
@@ -91,7 +97,7 @@ const AppHeader = () => {
             <CCol md={12}>
               <CFormSelect value={selectedBranchLocal} onChange={handleBranchChange}>
                 {branches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>{branch.name}</option>
+                  <option key={branch.id} value={branch.id + '%' +branch.name}>{branch.name}</option>
                 ))}
               </CFormSelect>
             </CCol>

@@ -47,6 +47,10 @@ public class ProductEntity {
     @Column(name = "ghi_chu")
     private String note;
 
+    public String getProductCode() {
+        return String.format("SP%05d", id);
+    }
+
 //    public String getProductType() {
 //        return productType.getTen();
 //    }

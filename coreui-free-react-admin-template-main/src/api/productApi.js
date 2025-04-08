@@ -11,6 +11,10 @@ const productApi = {
         return axiosClient.put('/api/products', product);
     },
     deleteProduct: (id) => axiosClient.delete(`/api/products/${id}`),
+
+    searchProductByKey(key) {
+        return axiosClient.get(`/api/products/search?keyword=${key}`);
+    },
 };
 
 export default productApi;

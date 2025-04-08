@@ -48,4 +48,10 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductEntity>> searchSanPham(@RequestParam("keyword") String keyword) {
+        List<ProductEntity> result = productService.searchProduct(keyword);
+        return ResponseEntity.ok(result);
+    }
 }

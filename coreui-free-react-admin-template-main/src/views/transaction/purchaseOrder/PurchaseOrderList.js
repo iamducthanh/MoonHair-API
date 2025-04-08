@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 import {
     CCard,
     CCardBody,
@@ -24,6 +25,7 @@ const PurchaseOrderList = () => {
     const [phieuNhapList, setPhieuNhapList] = useState([]);
     const [openRow, setOpenRow] = useState(null);
     const [expandedProductId, setExpandedProductId] = useState(null)
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Gọi API lấy danh sách phiếu nhập hàng
@@ -92,11 +94,11 @@ const PurchaseOrderList = () => {
     return (
         <CRow>
             <CCol style={{ textAlign: 'left', marginBottom: '10px' }} xs={6}>
-                <h4>Danh sách phiếu nhập hàng</h4>
+                <h4>Phiếu nhập hàng</h4>
             </CCol>
             <CCol style={{ textAlign: 'right', marginBottom: '10px' }} xs={6}>
-                <CButton color="primary" onClick={() => setVisible(true)}>
-                    + Thêm sản phẩm
+                <CButton color="primary" onClick={() => navigate('/transaction/purchaseOrder/add')}>
+                    + Nhập hàng
                 </CButton>
             </CCol>
             <CCol xs={12}>
