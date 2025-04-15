@@ -64,11 +64,13 @@ const ProductList = () => {
     }, [selectedBranchLocal]);
 
     const fetchProducts = async () => {
-        try {
-            const response = await productApi.getAllProductByBranch(selectedBranchLocal);
-            setProducts(response.data);
-        } catch (error) {
-            toast.error('Lỗi khi tải danh sách chi nhánh!');
+        if (selectedBranchLocal) {
+            try {
+                const response = await productApi.getAllProductByBranch(selectedBranchLocal);
+                setProducts(response.data);
+            } catch (error) {
+                toast.error('Lỗi khi tải danh sách sản phẩm!');
+            }
         }
     };
 
@@ -160,7 +162,7 @@ const ProductList = () => {
 
     const validateEditForm = () => {
         const errors = {};
-        const { name, price, quantity } = formData;
+        const { name, price } = formData;
 
         if (!name || name.trim() === '') {
             errors.name = 'Tên sản phẩm không được để trống';
@@ -168,10 +170,6 @@ const ProductList = () => {
 
         if (!price || isNaN(price) || Number(price) <= 0) {
             errors.price = 'Giá bán phải là số lớn hơn 0';
-        }
-
-        if (!quantity || isNaN(quantity) || Number(quantity) < 0) {
-            errors.quantity = 'Số lượng phải là số không âm';
         }
 
         setFormEditErrors(errors);
@@ -267,14 +265,7 @@ const ProductList = () => {
                                                                         <div>{p.price ? p.price.toLocaleString() : ''} VND</div>
                                                                     )}{formEditErrors.price && <div className="text-danger">{formEditErrors.price}</div>}
                                                                     </CCol>
-                                                                    <CCol md={1}><strong>Số lượng:</strong></CCol>
-                                                                    <CCol md={5}>{editMode ? (
-                                                                        <CFormInput name="quantity" invalid={!!formEditErrors.quantity}
-                                                                            value={formData.quantity} onChange={handleChange} type="number" />
-                                                                    ) : (
-                                                                        <div>{p.quantity}</div>
-                                                                    )}{formEditErrors.quantity && <div className="text-danger">{formEditErrors.quantity}</div>}
-                                                                    </CCol>
+                                                                    
                                                                 </CRow>
                                                                 <CRow className="mb-2">
                                                                     <CCol md={1}><strong>Ngày tạo:</strong></CCol>
@@ -372,17 +363,6 @@ const ProductList = () => {
                                     invalid={!!formErrors.price}
                                 />
                                 {formErrors.price && <div className="text-danger">{formErrors.price}</div>}
-                            </CCol>
-                            <CCol>
-                                <CFormInput
-                                    label="Số lượng"
-                                    type="number"
-                                    name="quantity"
-                                    value={formProductAdd.quantity}
-                                    onChange={handleChangeAddProduct}
-                                    invalid={!!formErrors.quantity}
-                                />
-                                {formErrors.quantity && <div className="text-danger">{formErrors.quantity}</div>}
                             </CCol>
                         </CRow>
 

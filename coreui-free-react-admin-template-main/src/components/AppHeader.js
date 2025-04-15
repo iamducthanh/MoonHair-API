@@ -95,7 +95,7 @@ const AppHeader = () => {
         <CHeaderNav className="ms-auto">
           <CRow >
             <CCol md={12}>
-              <CFormSelect value={selectedBranchLocal} onChange={handleBranchChange}>
+              <CFormSelect value={selectedBranchLocal+'%'+selectedBranchLocalName} onChange={handleBranchChange}>
                 {branches.map((branch) => (
                   <option key={branch.id} value={branch.id + '%' +branch.name}>{branch.name}</option>
                 ))}

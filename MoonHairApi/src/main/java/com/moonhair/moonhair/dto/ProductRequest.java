@@ -14,8 +14,6 @@ public class ProductRequest {
     @NotBlank
     private String name;
     @NotNull
-    private Integer quantity;
-    @NotNull
     private Double price;
     @NotBlank
     private String productType;

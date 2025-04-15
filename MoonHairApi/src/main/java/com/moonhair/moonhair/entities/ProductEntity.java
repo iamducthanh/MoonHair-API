@@ -25,8 +25,6 @@ public class ProductEntity {
     private Integer id;
     @Column(name = "ten")
     private String name;
-    @Column(name = "so_luong")
-    private Integer quantity;
     @Column(name = "gia_ban")
     private Double price;
     @Column(name = "loai")
@@ -48,7 +46,7 @@ public class ProductEntity {
     private String note;
 
     public String getProductCode() {
-        return String.format("SP%05d", id);
+        return String.format("SP%03d", id);
     }
 
 //    public String getProductType() {

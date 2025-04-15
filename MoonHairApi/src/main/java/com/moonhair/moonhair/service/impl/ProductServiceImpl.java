@@ -28,7 +28,6 @@ public class ProductServiceImpl implements IProductService {
     public ProductEntity createProduct(ProductRequest productRequest) {
         ProductEntity sp = ProductEntity.builder()
                 .name(productRequest.getName())
-                .quantity(productRequest.getQuantity())
                 .price(productRequest.getPrice())
                 .productType(ProductType.valueOf(productRequest.getProductType()))
                 .size(productRequest.getSize())
@@ -45,7 +44,6 @@ public class ProductServiceImpl implements IProductService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
         sp.setName(productRequest.getName());
-        sp.setQuantity(productRequest.getQuantity());
         sp.setPrice(productRequest.getPrice());
         sp.setSize(productRequest.getSize());
         sp.setNote(productRequest.getNote());
