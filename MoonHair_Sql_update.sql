@@ -40,12 +40,26 @@ CREATE TABLE lo_hang (
 select sp.ten, lh.gia_ban, lh.so_luong_con from san_pham sp left join lo_hang lh on sp.id = lh.id_san_pham ;
 ALTER TABLE san_pham DROP COLUMN so_luong;
 
+INSERT INTO MoonHair.chi_tiet_phieu_nhap
+(id, id_phieu_nhap, id_san_pham, so_luong, gia_nhap)
+VALUES(1, 1, 1, 15, 200000.00);
+INSERT INTO MoonHair.chi_tiet_phieu_nhap
+(id, id_phieu_nhap, id_san_pham, so_luong, gia_nhap)
+VALUES(2, 1, 2, 13, 300000.00);
+INSERT INTO MoonHair.chi_tiet_phieu_nhap
+(id, id_phieu_nhap, id_san_pham, so_luong, gia_nhap)
+VALUES(3, 1, 1, 10, 220000.00);
+
+INSERT INTO MoonHair.phieu_nhap
+(id, ma_phieu, id_chi_nhanh, ngay_tao, ten_ncc, trang_thai, tong_tien, giam_gia, tong_tien_thanh_toan, chi_phi_khac, ghi_chu)
+VALUES(1, 'PN-15042025-212634', 1, '2025-04-15 21:26:23', 'Nhà cc Thành', '1', 9100000.0, 0.0, 9100000.0, 0.0, 'Ghi chú');
+
 INSERT INTO MoonHair.lo_hang
-(id, id_san_pham, id_chi_tiet_phieu_nhap, ma_lo, so_luong_nhap, so_luong_con, gia_von, ngay_nhap, gia_ban)
-VALUES(1, 1, 1, 'SP001-15042025-001', 15, 15, 200000.00, '2025-04-15 21:34:54', 400000.00);
+(id, id_san_pham, id_chi_tiet_phieu_nhap, ma_lo, so_luong_nhap, so_luong_con, gia_von, gia_ban, ngay_nhap)
+VALUES(1, 1, 1, 'SP001-15042025-001', 15, 15, 200000.00, 400000.00, '2025-04-15 21:34:54');
 INSERT INTO MoonHair.lo_hang
-(id, id_san_pham, id_chi_tiet_phieu_nhap, ma_lo, so_luong_nhap, so_luong_con, gia_von, ngay_nhap, gia_ban)
-VALUES(3, 1, 1, 'SP001-15042025-002', 10, 10, 220000.0, '2025-04-15 21:34:54', 400000.0);
+(id, id_san_pham, id_chi_tiet_phieu_nhap, ma_lo, so_luong_nhap, so_luong_con, gia_von, gia_ban, ngay_nhap)
+VALUES(2, 2, 2, 'SP002-15042025-001', 13, 13, 300000.00, 500000.00, '2025-04-15 21:34:54');
 INSERT INTO MoonHair.lo_hang
-(id, id_san_pham, id_chi_tiet_phieu_nhap, ma_lo, so_luong_nhap, so_luong_con, gia_von, ngay_nhap, gia_ban)
-VALUES(2, 2, 2, 'SP002-15042025-001', 13, 13, 300000.00, '2025-04-15 21:34:54', 500000.00);
+(id, id_san_pham, id_chi_tiet_phieu_nhap, ma_lo, so_luong_nhap, so_luong_con, gia_von, gia_ban, ngay_nhap)
+VALUES(3, 1, 1, 'SP001-15042025-002', 10, 10, 220000.00, 400000.00, '2025-04-15 21:34:54');
