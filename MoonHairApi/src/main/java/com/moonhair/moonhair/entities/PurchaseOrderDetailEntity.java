@@ -21,7 +21,7 @@ public class PurchaseOrderDetailEntity {
     @Column(name = "so_luong", nullable = false)
     private Integer quantity;
 
-    @Column(name = "gia_nhap", nullable = false, precision = 15, scale = 2)
+    @Column(name = "gia_nhap", nullable = false)
     private Double importPrice;
 
 }

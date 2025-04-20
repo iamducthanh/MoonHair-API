@@ -1,23 +1,33 @@
--- MySQL dump 10.13  Distrib 8.0.19, for Win64 (x86_64)
---
--- Host: localhost    Database: moonhair
--- ------------------------------------------------------
--- Server version	8.0.40
+create table phieu_nhap (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ma_phieu` varchar(255),
+    `id_chi_nhanh` int NOT NULL,
+  `ngay_tao` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+`ten_ncc` varchar(255),
+`trang_thai` varchar(10),
+`tong_tien` double DEFAULT NULL,
+`giam_gia` double DEFAULT NULL,
+`tong_tien_thanh_toan` double DEFAULT NULL,
+`chi_phi_khac` double DEFAULT NULL,
+  `ghi_chu` varchar(1000) CHARACTER SET
+utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+);
 
---
--- Table structure for table `chi_nhanh`
---
+create table chi_tiet_phieu_nhap (
+	  `id` int NOT NULL AUTO_INCREMENT,
+  `id_phieu_nhap` int NOT NULL,
+  `ma_
+  
+  
+  
+  KEY `id_phieu_nhap` (`id_phieu_nhap`),
+  CONSTRAINT `phieu__ibfk_1` FOREIGN KEY (`id_phieu_nhap`) REFERENCES `phieu_nhap` (`id`) ON DELETE CASCADE
+
+);
+
+
+
 
 DROP TABLE IF EXISTS `chi_nhanh`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -30,16 +40,6 @@ CREATE TABLE `chi_nhanh` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `chi_nhanh`
---
-
-LOCK TABLES `chi_nhanh` WRITE;
-/*!40000 ALTER TABLE `chi_nhanh` DISABLE KEYS */;
-INSERT INTO `chi_nhanh` VALUES (1,'MoonHair Thái Bình','Lê Đại Hành',_binary ''),(2,'MoonHair Hải Dương','Chỗ nào Hải Dương ý',_binary ''),(3,'Moon Hair Tây Mỗ','2P5Q+GM7, Tây Mỗ, Bắc Từ Liêm, Hà Nội, Việt Nam',_binary '\0'),(4,'Tạ Ngọc Mai','2P5Q+GM7, Tây Mỗ, Bắc Từ Liêm, Hà Nội, Việt Nam',_binary '\0'),(5,'Hải Dương','2P5Q+GM7, Tây Mỗ, Bắc Từ Liêm, Hà Nội, Việt Nam',_binary '\0'),(6,'MoonHair Phủ Lý','Thành phố Phủ Lý',_binary '');
-/*!40000 ALTER TABLE `chi_nhanh` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `loai_san_pham`

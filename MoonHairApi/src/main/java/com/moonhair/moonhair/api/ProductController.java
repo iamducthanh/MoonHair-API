@@ -1,5 +1,6 @@
 package com.moonhair.moonhair.api;
 
+import com.moonhair.moonhair.dto.ProductList;
 import com.moonhair.moonhair.dto.ProductRequest;
 import com.moonhair.moonhair.entities.ProductEntity;
 import com.moonhair.moonhair.service.IProductService;
@@ -21,6 +22,11 @@ public class ProductController {
     @GetMapping
     public List<ProductEntity> getAllProductByBranch(@RequestParam Integer branchId) {
         return productService.getAllProductByBranch(branchId);
+    }
+
+    @GetMapping("/list")
+    public List<ProductList> getAllProductListByBranch(@RequestParam Integer branchId) {
+        return productService.getAllProductListByBranch(branchId);
     }
 
     @PostMapping

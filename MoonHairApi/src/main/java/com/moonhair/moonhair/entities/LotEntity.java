@@ -28,10 +28,10 @@ public class LotEntity {
     @Column(name = "so_luong_con", nullable = false)
     private Integer quantityRemaining;
 
-    @Column(name = "gia_von", nullable = false, precision = 15, scale = 2)
+    @Column(name = "gia_von", nullable = false)
     private Double costPrice;
 
-    @Column(name = "gia_ban", nullable = false, precision = 15, scale = 2)
+    @Column(name = "gia_ban", nullable = false)
     private Double sellingPrice;
 
     @Column(name = "ngay_nhap", nullable = false)

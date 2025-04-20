@@ -37,7 +37,7 @@ CREATE TABLE lo_hang (
     CONSTRAINT fk_lo_ctpn FOREIGN KEY (id_chi_tiet_phieu_nhap) REFERENCES chi_tiet_phieu_nhap(id)
 );
 
-select sp.ten, lh.gia_ban, lh.so_luong_con from san_pham sp left join lo_hang lh on sp.id = lh.id_san_pham ;
+select sp.ten, lh.ma_lo , sp.kich_thuoc,sp.loai, lh.gia_von, lh.gia_ban, lh.so_luong_nhap , lh.so_luong_con, sp.active  from san_pham sp left join lo_hang lh on sp.id = lh.id_san_pham where sp.loai = 'SAN_PHAM' ;
 ALTER TABLE san_pham DROP COLUMN so_luong;
 
 INSERT INTO MoonHair.chi_tiet_phieu_nhap
@@ -63,3 +63,6 @@ VALUES(2, 2, 2, 'SP002-15042025-001', 13, 13, 300000.00, 500000.00, '2025-04-15 
 INSERT INTO MoonHair.lo_hang
 (id, id_san_pham, id_chi_tiet_phieu_nhap, ma_lo, so_luong_nhap, so_luong_con, gia_von, gia_ban, ngay_nhap)
 VALUES(3, 1, 1, 'SP001-15042025-002', 10, 10, 220000.00, 400000.00, '2025-04-15 21:34:54');
+UPDATE san_pham
+SET gia_ban  = NULL
+WHERE loai = 'SAN_PHAM';

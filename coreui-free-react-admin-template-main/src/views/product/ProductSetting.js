@@ -20,7 +20,7 @@ import productApi from '../../api/productApi';
 import { useAppContext } from '../../context/AppContext';
 import { toast } from 'react-toastify';
 
-const ProductList = () => {
+const ProductSetting = () => {
     const [expandedProductId, setExpandedProductId] = useState(null)
     const [products, setProducts] = useState([]);
     const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
@@ -208,7 +208,6 @@ const ProductList = () => {
                                     <CTableHeaderCell>Loại hàng</CTableHeaderCell>
                                     <CTableHeaderCell>Tên hàng</CTableHeaderCell>
                                     <CTableHeaderCell>Giá bán</CTableHeaderCell>
-                                    <CTableHeaderCell>Tồn kho</CTableHeaderCell>
                                 </CTableRow>
                             </CTableHead>
                             <CTableBody>
@@ -220,7 +219,6 @@ const ProductList = () => {
                                             <CTableDataCell>{loaiSanPhamMap[p.productType]}</CTableDataCell>
                                             <CTableDataCell>{p.name}</CTableDataCell>
                                             <CTableDataCell>{p.price ? p.price.toLocaleString() : ''}</CTableDataCell>
-                                            <CTableDataCell>{p.quantity}</CTableDataCell>
                                         </CTableRow>
                                         <CTableRow>
                                             <CTableDataCell colSpan={6} className="p-0">
@@ -419,4 +417,4 @@ const ProductList = () => {
     )
 }
 
-export default ProductList
+export default ProductSetting

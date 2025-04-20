@@ -58,7 +58,8 @@ const EmployeeAdd = React.lazy(() => import('./views/system/employee/EmployeeAdd
 const EmployeeEdit = React.lazy(() => import('./views/system/employee/EmployeeEdit'))
 
 // product
-const ProductList = React.lazy(() => import('./views/product/Product'))
+const ProductSetting = React.lazy(() => import('./views/product/ProductSetting'))
+const ProductList = React.lazy(() => import('./views/productList/ProductList'))
 
 // transaction
 const PurchaseOrderList = React.lazy(() => import('./views/transaction/purchaseOrder/PurchaseOrderList'))
@@ -122,6 +123,7 @@ const routes = [
   { path: '/system/employee/:id', name: 'Sửa nhân viên', element: EmployeeEdit },
 
   // product
+  { path: '/product/setting', name: 'Sản phẩm', element: ProductSetting },
   { path: '/product/list', name: 'Sản phẩm', element: ProductList },
 
   // transaction

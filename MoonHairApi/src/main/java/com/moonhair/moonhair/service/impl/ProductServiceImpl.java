@@ -1,6 +1,7 @@
 package com.moonhair.moonhair.service.impl;
 
 import com.moonhair.moonhair.constant.ProductType;
+import com.moonhair.moonhair.dto.ProductList;
 import com.moonhair.moonhair.dto.ProductRequest;
 import com.moonhair.moonhair.entities.ProductEntity;
 import com.moonhair.moonhair.repositories.ProductRepository;
@@ -22,6 +23,11 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public List<ProductEntity> getAllProductByBranch(Integer branchId) {
         return productRepository.findAllByBranchIdAndDeleteFlagIsFalse(branchId);
+    }
+
+    @Override
+    public List<ProductList> getAllProductListByBranch(Integer branchId) {
+        return productRepository.findAllProductListByBranch(branchId);
     }
 
     @Override
