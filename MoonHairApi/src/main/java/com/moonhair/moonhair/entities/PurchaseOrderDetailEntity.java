@@ -18,6 +18,9 @@ public class PurchaseOrderDetailEntity {
     @Column(name = "id_san_pham", nullable = false)
     private Integer productId;
 
+    @Column(name = "ten_san_pham", nullable = false)
+    private String productName;
+
     @Column(name = "so_luong", nullable = false)
     private Integer quantity;
 

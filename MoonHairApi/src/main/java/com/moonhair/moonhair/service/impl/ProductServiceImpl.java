@@ -3,6 +3,7 @@ package com.moonhair.moonhair.service.impl;
 import com.moonhair.moonhair.constant.ProductType;
 import com.moonhair.moonhair.dto.ProductList;
 import com.moonhair.moonhair.dto.ProductRequest;
+import com.moonhair.moonhair.dto.ProductSearch;
 import com.moonhair.moonhair.entities.ProductEntity;
 import com.moonhair.moonhair.repositories.ProductRepository;
 import com.moonhair.moonhair.service.IProductService;
@@ -66,8 +67,8 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.save(sp);       }
 
     @Override
-    public List<ProductEntity> searchProduct(String key) {
+    public List<ProductSearch> searchProduct(String key, String branchId) {
         Pageable topTen = PageRequest.of(0, 10); // Page 0, size 10
-        return productRepository.searchByKeyword(key, topTen);
+        return productRepository.searchByKeyword(key, Integer.valueOf(branchId), topTen);
     }
 }

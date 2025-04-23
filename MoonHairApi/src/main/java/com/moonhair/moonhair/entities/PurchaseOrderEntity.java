@@ -2,12 +2,15 @@ package com.moonhair.moonhair.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "phieu_nhap")
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class PurchaseOrderEntity {
 
     @Id
@@ -21,6 +24,7 @@ public class PurchaseOrderEntity {
     private Integer branchId;
 
     @Column(name = "ngay_tao")
+    @CreatedDate
     private LocalDateTime createdAt;
 
     @Column(name = "ten_ncc")

@@ -66,3 +66,20 @@ VALUES(3, 1, 1, 'SP001-15042025-002', 10, 10, 220000.00, 400000.00, '2025-04-15 
 UPDATE san_pham
 SET gia_ban  = NULL
 WHERE loai = 'SAN_PHAM';
+
+select sp.id, sp.ten, sp.kich_thuoc, sum(lh.so_luong_con)  from san_pham sp left join lo_hang lh on sp.id = lh.id_san_pham where sp.loai = 'SAN_PHAM' group by sp.id, sp.ten;
+
+ALTER TABLE chi_tiet_phieu_nhap 
+ADD COLUMN ten_san_pham varchar(255);
+
+
+
+
+
+
+
+
+
+
+
+

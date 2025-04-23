@@ -2,6 +2,7 @@ package com.moonhair.moonhair.api;
 
 import com.moonhair.moonhair.dto.ProductList;
 import com.moonhair.moonhair.dto.ProductRequest;
+import com.moonhair.moonhair.dto.ProductSearch;
 import com.moonhair.moonhair.entities.ProductEntity;
 import com.moonhair.moonhair.service.IProductService;
 import jakarta.validation.Valid;
@@ -56,8 +57,8 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ProductEntity>> searchSanPham(@RequestParam("keyword") String keyword) {
-        List<ProductEntity> result = productService.searchProduct(keyword);
+    public ResponseEntity<List<ProductSearch>> searchSanPham(@RequestParam("keyword") String keyword, @RequestParam("branchId") String branchId) {
+        List<ProductSearch> result = productService.searchProduct(keyword, branchId);
         return ResponseEntity.ok(result);
     }
 }

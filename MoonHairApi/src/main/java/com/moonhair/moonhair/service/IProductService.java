@@ -2,6 +2,7 @@ package com.moonhair.moonhair.service;
 
 import com.moonhair.moonhair.dto.ProductList;
 import com.moonhair.moonhair.dto.ProductRequest;
+import com.moonhair.moonhair.dto.ProductSearch;
 import com.moonhair.moonhair.entities.EmployeeEntity;
 import com.moonhair.moonhair.entities.ProductEntity;
 
@@ -13,5 +14,5 @@ public interface IProductService {
     ProductEntity createProduct(ProductRequest productRequest);
     ProductEntity updateProduct(ProductRequest productRequest);
     ProductEntity deleteProduct(Integer id);
-    List<ProductEntity> searchProduct(String key);
+    List<ProductSearch> searchProduct(String key, String branchId);
 }

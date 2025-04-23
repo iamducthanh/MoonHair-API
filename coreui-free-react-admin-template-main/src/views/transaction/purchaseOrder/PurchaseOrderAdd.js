@@ -6,12 +6,16 @@ import {
     CTableRow, CTableDataCell, CTableHeaderCell,
     CInputGroup, CInputGroupText, CFormTextarea, CForm
 } from '@coreui/react'
+import { useNavigate } from 'react-router-dom';
 import { cilTrash } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import productApi from '../../../api/productApi';
+import purchaseOrderApi from '../../../api/purchaseOrderApi';
 import { useAppContext } from '../../../context/AppContext';
+import { toast } from 'react-toastify';
 
 const PurchaseOrderAdd = () => {
+    const navigate = useNavigate();
     const [sanPham, setSanPham] = useState([])
     const [phieuNhap, setPhieuNhap] = useState({
         giamGia: 0,
@@ -40,7 +44,7 @@ const PurchaseOrderAdd = () => {
     const handleFocus = async () => {
         setShowDropdown(true)
         try {
-            const res = await productApi.searchProductByKey(keyword)
+            const res = await productApi.searchProductByKey(keyword, selectedBranchLocal)
             setSanPhamSearch(res.data)
         } catch (err) {
             console.error('Lỗi tìm sản phẩm:', err)
@@ -80,7 +84,7 @@ const PurchaseOrderAdd = () => {
         const value = e.target.value
         setKeyword(value)
         try {
-            const res = await productApi.searchProductByKey(keyword)
+            const res = await productApi.searchProductByKey(keyword, selectedBranchLocal)
             setSanPhamSearch(res.data)
         } catch (err) {
             console.error('Lỗi tìm sản phẩm:', err)
@@ -93,7 +97,7 @@ const PurchaseOrderAdd = () => {
         setSanPham(newSanPham);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!nhaCungCap.trim()) {
@@ -106,6 +110,14 @@ const PurchaseOrderAdd = () => {
         phieuNhap.tongTienHang = tongTienHang
         phieuNhap.product = sanPham
         // Gửi dữ liệu
+
+        try {
+            const response = await purchaseOrderApi.createPurchaseOrder(phieuNhap);
+            toast.success('Thêm phiếu nhập thành công!');
+            navigate('/transaction/purchaseOrder');
+        } catch (error) {
+            toast.error('Lỗi khi tạo phiếu nhập!');
+        }
         console.log(phieuNhap);
     };
 
@@ -130,10 +142,10 @@ const PurchaseOrderAdd = () => {
                                     >
                                         <div className="d-flex align-items-center">
                                             <div>
-                                                <div><strong>{item.name}</strong></div>
+                                                <div><strong>{item.productName}</strong></div>
                                                 <div className="text-muted" style={{ fontSize: '0.85rem' }}>
-                                                    {item.productCode} – Giá: {item.price?.toLocaleString('vi-VN') ?? '0'}<br />
-                                                    Tồn: {item.quantity}
+                                                    {item.productCode} – Kích thước: {item.size}<br />
+                                                    Tồn: {item.quantityRemaining}
                                                 </div>
                                             </div>
                                         </div>
@@ -167,7 +179,7 @@ const PurchaseOrderAdd = () => {
                                     <CTableRow key={index} style={{ verticalAlign: 'middle' }}>
                                         <CTableDataCell>{index + 1}</CTableDataCell>
                                         <CTableDataCell>{sp.productCode}</CTableDataCell>
-                                        <CTableDataCell>{sp.name}</CTableDataCell>
+                                        <CTableDataCell>{sp.productName}</CTableDataCell>
                                         <CTableDataCell><CFormInput style={{ width: '80px' }} onChange={(e) => handleSoLuongChange(index, e.target.value)} type="number" value={sp.soLuongNhap} /></CTableDataCell>
                                         <CTableDataCell><CFormInput style={{ width: '120px' }} onChange={(e) => handleDonGiaChange(index, e.target.value)} type="number" value={sp.donGia.toLocaleString()} /></CTableDataCell>
                                         <CTableDataCell>{sp.thanhTien.toLocaleString()}</CTableDataCell>
@@ -257,7 +269,7 @@ const PurchaseOrderAdd = () => {
                             />
 
                             <div className="mt-3" style={{ textAlign: 'right' }}>
-                                <CButton type="submit" color="success">Hoàn thành</CButton>
+                                <CButton type="submit" style={{color: 'white'}} color="success">Hoàn thành</CButton>
                             </div>
                         </CCardBody>
                     </CForm>

@@ -3,10 +3,13 @@ package com.moonhair.moonhair.entities;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "lo_hang")
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class LotEntity {
 
     @Id
@@ -35,6 +38,7 @@ public class LotEntity {
     private Double sellingPrice;
 
     @Column(name = "ngay_nhap", nullable = false)
+    @CreatedDate
     private LocalDateTime importDate;
 
 }
