@@ -2,6 +2,7 @@ package com.moonhair.moonhair.service.impl;
 
 import com.moonhair.moonhair.dto.PurchaseOrder;
 import com.moonhair.moonhair.dto.PurchaseOrderDetail;
+import com.moonhair.moonhair.dto.PurchaseOrderResponse;
 import com.moonhair.moonhair.entities.LotEntity;
 import com.moonhair.moonhair.entities.PurchaseOrderDetailEntity;
 import com.moonhair.moonhair.entities.PurchaseOrderEntity;
@@ -17,6 +18,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.moonhair.moonhair.utils.CodeGenerator.generatePurchaseOrderCode;
 
@@ -36,7 +42,7 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
         purchaseOrder.setBranchId(purchaseOrderDTO.getBranchId());
         purchaseOrder.setSupplierName(purchaseOrderDTO.getNhaCungCap());
         purchaseOrder.setStatus("100");
-        purchaseOrder.setTotalAmount(purchaseOrderDTO.getTienTra());
+        purchaseOrder.setTotalAmount(purchaseOrderDTO.getTongTienHang());
         purchaseOrder.setDiscount(purchaseOrderDTO.getGiamGia());
         purchaseOrder.setFinalAmount(purchaseOrderDTO.getTienTra());
         purchaseOrder.setOtherCost(purchaseOrderDTO.getChiPhiKhac());
@@ -67,6 +73,51 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
 
         return purchaseOrder;
     }
+
+    @Override
+    public List<PurchaseOrderResponse> getAllPurchaseOrders(Integer branchId) {
+// Lấy kết quả với `LEFT JOIN`
+        List<Object[]> results = purchaseOrderRepository.findAllPurchaseOrdersWithDetails(branchId);
+
+        // Sử dụng LinkedHashMap để gộp các chi tiết phiếu nhập dựa trên ID phiếu nhập
+        Map<Integer, PurchaseOrderResponse> responseMap = new LinkedHashMap<>();
+
+        for (Object[] row : results) {
+            PurchaseOrderEntity po = (PurchaseOrderEntity) row[0];
+            PurchaseOrderDetailEntity pod = (PurchaseOrderDetailEntity) row[1];
+
+            // Nếu DTO của phiếu nhập chưa tồn tại, tạo mới
+            PurchaseOrderResponse response = responseMap.get(po.getId());
+            if (response == null) {
+                response = PurchaseOrderResponse.builder()
+                        .id(po.getId())
+                        .code(po.getCode())
+                        .branchId(po.getBranchId())
+                        .createdAt(po.getCreatedAt())
+                        .supplierName(po.getSupplierName())
+                        .status(po.getStatus())
+                        .totalAmount(po.getTotalAmount())
+                        .discount(po.getDiscount())
+                        .finalAmount(po.getFinalAmount())
+                        .otherCost(po.getOtherCost())
+                        .note(po.getNote())
+                        .details(new ArrayList<>()) // Tạo danh sách chi tiết rỗng
+                        .build();
+
+                responseMap.put(po.getId(), response);
+            }
+
+            // Thêm chi tiết vào danh sách nếu `pod` không null
+            if (pod != null) {
+                response.getDetails().add(pod);
+            }
+        }
+
+        // Trả về danh sách phiếu nhập
+        return new ArrayList<>(responseMap.values());
+
+    }
+
 
     public String generateLotCode(Integer productId) {
         // Định dạng ngày hiện tại thành ddMMyyyy

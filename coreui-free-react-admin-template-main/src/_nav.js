@@ -93,6 +93,11 @@ const _nav = [
         component: CNavItem,
         name: 'Nhập hàng',
         to: '/transaction/purchaseOrder',
+      },
+      {
+        component: CNavItem,
+        name: 'Bán hàng',
+        to: '/transaction/sell',
       }
     ],
   },

@@ -25,7 +25,7 @@ const PurchaseOrderAdd = () => {
     const [nhaCungCap, setNhaCungCap] = useState('')
     const [ngayNhap, setNgayNhap] = useState(new Date().toISOString().slice(0, 16))
     const tinhThanhTien = (sp) => sp.soLuongNhap * sp.donGia
-    const tongTienHang = sanPham.reduce((total, sp) => total + tinhThanhTien(sp), 0) - phieuNhap.giamGia
+    const tongTienHang = sanPham.reduce((total, sp) => total + tinhThanhTien(sp), 0)
     const [showDropdown, setShowDropdown] = useState(false);
     const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
     const { selectedBranchLocalName, setSelectedBranchLocalName } = useAppContext();
@@ -236,7 +236,7 @@ const PurchaseOrderAdd = () => {
                             />
 
                             <div className="mb-2 text-danger">
-                                <strong>Cần trả nhà cung cấp:</strong> {tongTienHang.toLocaleString()}
+                                <strong>Cần trả nhà cung cấp:</strong> {(tongTienHang - phieuNhap.giamGia).toLocaleString()}
                             </div>
 
                             <CFormInput

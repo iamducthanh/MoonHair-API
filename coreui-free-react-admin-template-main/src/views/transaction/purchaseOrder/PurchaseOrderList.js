@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
+import purchaseOrderApi from '../../../api/purchaseOrderApi';
 import {
     CCard,
     CCardBody,
@@ -19,6 +20,7 @@ import {
 } from '@coreui/react'
 import productApi from '../../../api/productApi';
 import { toast } from 'react-toastify';
+import { useAppContext } from '../../../context/AppContext';
 
 
 const PurchaseOrderList = () => {
@@ -26,70 +28,22 @@ const PurchaseOrderList = () => {
     const [openRow, setOpenRow] = useState(null);
     const [expandedProductId, setExpandedProductId] = useState(null)
     const navigate = useNavigate();
+    const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
+    const { selectedBranchLocalName, setSelectedBranchLocalName } = useAppContext();
 
     useEffect(() => {
         // Gọi API lấy danh sách phiếu nhập hàng
         fetchPhieuNhap();
-    }, []);
+    }, [selectedBranchLocal]);
 
     const fetchPhieuNhap = async () => {
-        // Giả lập dữ liệu
-        const fakeData = [
-            {
-                id: 'PN000050',
-                thoiGian: '28/03/2025 22:41',
-                nhaCungCap: 'ABC Pharma',
-                canTra: 260000,
-                trangThai: 'Đã nhập hàng',
-                chiNhanh: 'Chi nhánh trung tâm',
-                nhanVien: 'Minh Tuấn',
-                sanPham: [
-                    {
-                        maHang: 'SP000027',
-                        tenHang: 'Kem dưỡng ẩm Bioderma Sebium Pore Refiner',
-                        soLuong: 1,
-                        donGia: 260000,
-                        giamGia: 0,
-                        giaNhap: 260000,
-                    },
-                ],
-            },
-            {
-                id: 'PN000051',
-                thoiGian: '28/03/2025 22:41',
-                nhaCungCap: 'ABC Pharma',
-                canTra: 260000,
-                trangThai: 'Đã nhập hàng',
-                chiNhanh: 'Chi nhánh trung tâm',
-                nhanVien: 'Minh Tuấn',
-                sanPham: [
-                    {
-                        maHang: 'SP000027',
-                        tenHang: 'Kem dưỡng ẩm Bioderma Sebium Pore Refiner',
-                        soLuong: 1,
-                        donGia: 260000,
-                        giamGia: 0,
-                        giaNhap: 260000,
-                    },
-                ],
-            },
-        ];
-
-        setPhieuNhapList(fakeData);
-
-        setExpandedProductId(fakeData[0].id);
+        const res = await purchaseOrderApi.getAllPurchaseOrder(selectedBranchLocal)
+        setPhieuNhapList(res.data);
     };
 
     const handleRowClick = (id) => {
         setExpandedProductId((prev) => (prev === id ? null : id))
     }
-
-    function revertDateToInput(inputDate) {
-        const [datePart, timePart] = inputDate.split(" ");
-        const [day, month, year] = datePart.split("/");
-        return `${year}-${month}-${day} ${timePart}`;
-    }
-
 
     return (
         <CRow>
@@ -118,11 +72,11 @@ const PurchaseOrderList = () => {
                                 {phieuNhapList.map((item) => (
                                     <React.Fragment key={item.id}>
                                         <CTableRow onClick={() => handleRowClick(item.id)} style={{ cursor: 'pointer' }}>
-                                            <CTableDataCell>{item.id}</CTableDataCell>
-                                            <CTableDataCell>{item.thoiGian}</CTableDataCell>
-                                            <CTableDataCell>{item.nhaCungCap}</CTableDataCell>
-                                            <CTableDataCell>{item.canTra.toLocaleString()}</CTableDataCell>
-                                            <CTableDataCell>{item.trangThai}</CTableDataCell>
+                                            <CTableDataCell>{item.code}</CTableDataCell>
+                                            <CTableDataCell>{new Date(item.createdAt).toLocaleString()}</CTableDataCell>
+                                            <CTableDataCell>{item.supplierName}</CTableDataCell>
+                                            <CTableDataCell>{item.finalAmount.toLocaleString()}</CTableDataCell>
+                                            <CTableDataCell>{item.status}</CTableDataCell>
                                         </CTableRow>
                                         <CTableRow>
                                             <CTableDataCell colSpan={6} className="p-0">
@@ -133,13 +87,13 @@ const PurchaseOrderList = () => {
                                                                 <strong>Mã nhập hàng:</strong>
                                                             </CCol>
                                                             <CCol md={4}>
-                                                                <p>{item.id}</p>
+                                                                <p>{item.code}</p>
                                                             </CCol>
                                                             <CCol md={2}>
                                                                 <strong>Chi nhánh:</strong>
                                                             </CCol>
                                                             <CCol md={4}>
-                                                                <p>{item.chiNhanh}</p>
+                                                                <p>{selectedBranchLocalName}</p>
                                                             </CCol>
                                                         </CRow>
                                                         <CRow>
@@ -147,7 +101,9 @@ const PurchaseOrderList = () => {
                                                                 <strong>Thời gian:</strong>
                                                             </CCol>
                                                             <CCol md={4}>
-                                                                <CFormInput name="name" className='mb-1' type="datetime-local" value={revertDateToInput(item.thoiGian)}></CFormInput>
+                                                                <CFormInput name="name" className='mb-1' type="datetime-local" 
+                                                                value={item.createdAt}
+                                                                ></CFormInput>
                                                             </CCol>
                                                             <CCol md={2}>
                                                                 <strong>Nhân viên nhập:</strong>
@@ -161,14 +117,14 @@ const PurchaseOrderList = () => {
                                                                 <strong>Nhà cung cấp:</strong>
                                                             </CCol>
                                                             <CCol md={4}>
-                                                                <CFormInput className='mb-1' name="name" type="text" value={item.nhaCungCap}></CFormInput>
+                                                                <CFormInput className='mb-1' name="name" type="text" value={item.supplierName}></CFormInput>
 
                                                             </CCol>
                                                         </CRow>
                                                         <CRow className="mb-2">
                                                             <CCol md={2}><strong>Ghi chú:</strong></CCol>
                                                             <CCol md={7}>
-                                                                <CFormTextarea name="note" rows={4} value='' />
+                                                                <CFormTextarea name="note" rows={4} value={item.note} />
                                                             </CCol>
                                                         </CRow>
                                                         <CTable>
@@ -177,38 +133,28 @@ const PurchaseOrderList = () => {
                                                                     <CTableHeaderCell>Mã hàng hóa</CTableHeaderCell>
                                                                     <CTableHeaderCell>Tên hàng</CTableHeaderCell>
                                                                     <CTableHeaderCell>Số lượng</CTableHeaderCell>
-                                                                    <CTableHeaderCell>Đơn giá</CTableHeaderCell>
                                                                     <CTableHeaderCell>Giá nhập</CTableHeaderCell>
-                                                                    <CTableHeaderCell>Thành tiền</CTableHeaderCell>
+                                                                    <CTableHeaderCell style={{textAlign: 'right'}}>Thành tiền</CTableHeaderCell>
                                                                 </CTableRow>
                                                             </CTableHead>
                                                             <CTableBody>
-                                                                {item.sanPham.map((sp, index) => (
+                                                                {item.details.map((sp, index) => (
                                                                     <CTableRow key={index}>
                                                                         <CTableDataCell>{sp.maHang}</CTableDataCell>
-                                                                        <CTableDataCell>{sp.tenHang}</CTableDataCell>
-                                                                        <CTableDataCell>{sp.soLuong}</CTableDataCell>
-                                                                        <CTableDataCell>{sp.donGia.toLocaleString()}</CTableDataCell>
-                                                                        <CTableDataCell>{sp.giaNhap.toLocaleString()}</CTableDataCell>
-                                                                        <CTableDataCell style={{ textAlign: 'right' }}>{(sp.soLuong * sp.giaNhap).toLocaleString()}</CTableDataCell>
+                                                                        <CTableDataCell>{sp.productName}</CTableDataCell>
+                                                                        <CTableDataCell>{sp.quantity}</CTableDataCell>
+                                                                        <CTableDataCell>{sp.importPrice.toLocaleString()}</CTableDataCell>
+                                                                        <CTableDataCell style={{ textAlign: 'right' }}>{(sp.quantity * sp.importPrice).toLocaleString()}</CTableDataCell>
                                                                     </CTableRow>
                                                                 ))}
                                                             </CTableBody>
                                                         </CTable>
                                                         <CRow>
                                                             <CCol style={{ textAlign: 'right' }} md={10}>
-                                                                <strong>Tổng số lượng:</strong>
-                                                            </CCol>
-                                                            <CCol style={{ textAlign: 'right', paddingRight: '20px' }} md={2}>
-                                                                <p>{item.id}</p>
-                                                            </CCol>
-                                                        </CRow>
-                                                        <CRow>
-                                                            <CCol style={{ textAlign: 'right' }} md={10}>
                                                                 <strong>Tổng số mặt hàng:</strong>
                                                             </CCol>
                                                             <CCol style={{ textAlign: 'right', paddingRight: '20px' }} md={2}>
-                                                                <p>{item.id}</p>
+                                                                <p>{item.details.length}</p>
                                                             </CCol>
                                                         </CRow>
                                                         <CRow>
@@ -216,15 +162,32 @@ const PurchaseOrderList = () => {
                                                                 <strong>Tổng tiền hàng:</strong>
                                                             </CCol>
                                                             <CCol style={{ textAlign: 'right', paddingRight: '20px' }} md={2}>
-                                                                <p>{item.id}</p>
+                                                                <p>{item.totalAmount.toLocaleString()}</p>
                                                             </CCol>
                                                         </CRow>
                                                         <CRow>
                                                             <CCol style={{ textAlign: 'right' }} md={10}>
-                                                                <strong>Tiền cần trả:</strong>
+                                                                <strong>Giảm giá:</strong>
                                                             </CCol>
                                                             <CCol style={{ textAlign: 'right', paddingRight: '20px' }} md={2}>
-                                                                <p>{item.id}</p>
+                                                                <p>{item.discount ? item.discount.toLocaleString():0}</p>
+                                                            </CCol>
+                                                        </CRow>
+                                                        <CRow>
+                                                            <CCol style={{ textAlign: 'right' }} md={10}>
+                                                                <strong>Chi phí khác:</strong>
+                                                            </CCol>
+                                                            <CCol style={{ textAlign: 'right', paddingRight: '20px' }} md={2}>
+                                                                <p>{item.otherCost ? item.otherCost.toLocaleString():0}</p>
+                                                            </CCol>
+                                                        </CRow>
+                                                        <CRow>
+                                                            <CCol style={{ textAlign: 'right' }} md={10}>
+                                                                <strong>Số tiền thanh toán:</strong>
+                                                            </CCol>
+                                                            <CCol style={{ textAlign: 'right', paddingRight: '20px' }} md={2}>
+                                                                <p>{item.finalAmount ? item.finalAmount.toLocaleString():0}</p>
+                                                                
                                                             </CCol>
                                                         </CRow>
                                                         <CRow>
