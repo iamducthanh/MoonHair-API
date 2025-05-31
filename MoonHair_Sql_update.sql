@@ -72,6 +72,10 @@ select sp.id, sp.ten, sp.kich_thuoc, sum(lh.so_luong_con)  from san_pham sp left
 ALTER TABLE chi_tiet_phieu_nhap 
 ADD COLUMN ten_san_pham varchar(255);
 
+-- 23/05
+ALTER TABLE nhan_vien MODIFY COLUMN id_chi_nhanh INT NULL;
+ALTER TABLE nhan_vien ADD COLUMN loai VARCHAR(10);
+
 
 
 

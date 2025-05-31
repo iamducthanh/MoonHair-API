@@ -41,4 +41,7 @@ public class EmployeeEntity {
 
     @Column(name = "mat_khau")
     private String password;
+
+    @Column(name = "loai")
+    private String type;
 }

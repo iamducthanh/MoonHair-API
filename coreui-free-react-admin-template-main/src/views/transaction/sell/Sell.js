@@ -1,12 +1,22 @@
 import {
   CRow, CCol, CCard, CCardBody, CButton, CFormInput, CFormSelect,
-  CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell
+  CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CFormCheck
 } from '@coreui/react'
 import { cilTrash, cilPlus, cilMinus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import React, { useState, useEffect } from 'react'
+import sellApi from '../../../api/sellApi';
+import { useAppContext } from '../../../context/AppContext';
+import employeeApi from '../../../api/employeeApi';
 
 export default function BanHangScreen() {
+  const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
+  const { selectedBranchLocalName, setSelectedBranchLocalName } = useAppContext();
+  const [danhSachSanPham, setDanhSachSanPham] = useState([])
+  const [danhSachDichVu, setDanhSachDichVu] = useState([])
+  const [expandedProductId, setExpandedProductId] = useState([])
+  const [giamGia, setGiamGia] = useState(0);
+  const [phuongThucThanhToan, setPhuongThucThanhToan] = useState('tienmat'); // 'tienmat' hoặc 'chuyenkhoan'
   const [dichVuDaChon, setDichVuDaChon] = useState([])
   const nhanVienList = [
     { id: 'NV001', tenNhanVien: 'Nguyễn Văn A' },
@@ -14,16 +24,48 @@ export default function BanHangScreen() {
     { id: 'NV003', tenNhanVien: 'Lê Văn C' },
     { id: 'NV004', tenNhanVien: 'Phạm Thị D' },
   ];
+  const tongTien = dichVuDaChon.reduce((sum, sp) => sum + sp.soLuong * sp.donGia, 0)
+  const tongTienSauGiamGia = Math.max(tongTien - giamGia, 0);
+  const [employees, setEmployees] = useState([]);
 
+  useEffect(() => {
+    // Gọi API lấy danh sách phiếu nhập hàng
+    fetchProduct();
+    fetchEmployee();
+  }, [selectedBranchLocal]);
+
+  const fetchProduct = async () => {
+    const products = await sellApi.getAllProductSell(selectedBranchLocal)
+    setDanhSachSanPham(products.data)
+    const services = await sellApi.getAllServiceSell(selectedBranchLocal)
+    setDanhSachDichVu(services.data)
+    console.log(services.data)
+  };
+
+  const fetchEmployee = async () => {
+    const response = await employeeApi.getEmployeesByBranch(selectedBranchLocal);
+    setEmployees(response.data);
+  };
 
   const handleThemDichVu = (item) => {
     const existed = dichVuDaChon.find(sp => sp.id === item.id)
+
+    let price = 0;
+    let name = "";
+    if (loaiTab === 'sanpham') {
+      price = item.priceOut;
+      name = item.productName;
+    } else {
+      name = item.name;
+      price = item.price;
+    }
+    console.log(name)
     if (existed) {
       setDichVuDaChon(dichVuDaChon.map(sp =>
-        sp.id === item.id ? { ...sp, soLuong: sp.soLuong + 1 } : sp
+        sp.id === item.id ? { ...sp, soLuong: sp.soLuong + 1, donGia: price, name: name } : sp
       ))
     } else {
-      setDichVuDaChon([...dichVuDaChon, { ...item, soLuong: 1 }])
+      setDichVuDaChon([...dichVuDaChon, { ...item, soLuong: 1, donGia: price, name: name }])
     }
   }
 
@@ -45,27 +87,16 @@ export default function BanHangScreen() {
     setDichVuDaChon(newList);
   };
 
-  const tongTien = dichVuDaChon.reduce((sum, sp) => sum + sp.soLuong * sp.donGia, 0)
-
   const [loaiTab, setLoaiTab] = useState('sanpham') // hoặc 'dichvu'
-
-  const danhSachSanPham = [
-    { id: 1, ten: 'Sản phẩm dưỡng tóc', ma: 'SP001', donGia: 300000 },
-    { id: 2, ten: 'Tinh dầu gội đầu', ma: 'SP002', donGia: 250000 },
-  ]
-
-  const danhSachDichVu = [
-    { id: 3, ten: 'Nhuộm tóc nữ ngắn', ma: 'DV001', donGia: 650000 },
-    { id: 4, ten: 'Gội đầu thảo dược', ma: 'DV002', donGia: 100000 },
-  ]
 
   const handleThemSanPham = () => {
     const sanPhamMoi = {
-      id: Date.now(),
+      id: generateUUIDv4(),
       productCode: 'SPM000',
-      name: 'Sản phẩm mới',
+      name: '',
+      kyc: false,
       soLuongNhap: 1,
-      donGia: 0
+      donGia: ''
     };
 
     setDichVuDaChon([...dichVuDaChon, { ...sanPhamMoi, soLuong: 1 }])
@@ -76,6 +107,21 @@ export default function BanHangScreen() {
     newList[index][field] = value;
     setDichVuDaChon(newList);
   };
+
+  function generateUUIDv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+  
+
+  const saveSell = () => {
+    console.log('Chi tiết:', dichVuDaChon)
+    console.log('Giảm giá:', giamGia)
+    console.log('Phương thức:', phuongThucThanhToan)
+  }
 
   return (
     <CRow>
@@ -100,12 +146,35 @@ export default function BanHangScreen() {
 
         </div>
         <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-          <div>
-            {(loaiTab === 'sanpham' ? danhSachSanPham : danhSachDichVu).map((item) => (
-              <CCard key={item.id} className="mb-2" onClick={() => handleThemDichVu(item)} style={{ cursor: 'pointer' }}>
+          {/* Danh sách sản phẩm */}
+          <div style={{ display: loaiTab === 'sanpham' ? 'block' : 'none' }}>
+            {danhSachSanPham.map((item) => (
+              <CCard
+                key={item.lotCode}
+                className="mb-2"
+                onClick={() => handleThemDichVu(item)}
+                style={{ cursor: 'pointer' }}
+              >
                 <CCardBody>
-                  <div><strong>{item.ten}</strong></div>
-                  <div>{item.donGia.toLocaleString()} đ</div>
+                  <div><strong>{item.productName} - {item.size}</strong></div>
+                  <div>{item.priceOut.toLocaleString()} đ - Tồn {item.quantityRemaining}</div>
+                </CCardBody>
+              </CCard>
+            ))}
+          </div>
+
+          {/* Danh sách dịch vụ */}
+          <div style={{ display: loaiTab === 'dichvu' ? 'block' : 'none' }}>
+            {danhSachDichVu.map((item) => (
+              <CCard
+                key={item.id}
+                className="mb-2"
+                onClick={() => handleThemDichVu(item)}
+                style={{ cursor: 'pointer' }}
+              >
+                <CCardBody>
+                  <div><strong>{item.name}</strong></div>
+                  <div>{item.price.toLocaleString()} đ</div>
                 </CCardBody>
               </CCard>
             ))}
@@ -119,9 +188,10 @@ export default function BanHangScreen() {
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell>#</CTableHeaderCell>
-              <CTableHeaderCell>Dịch vụ</CTableHeaderCell>
+              <CTableHeaderCell>Sản phẩm/khách hàng</CTableHeaderCell>
               <CTableHeaderCell>Nhân viên</CTableHeaderCell>
-              <CTableHeaderCell>Số lượng</CTableHeaderCell>
+              <CTableHeaderCell>SL</CTableHeaderCell>
+              <CTableHeaderCell>KYC</CTableHeaderCell>
               <CTableHeaderCell>Đơn giá</CTableHeaderCell>
               <CTableHeaderCell>Thành tiền</CTableHeaderCell>
               <CTableHeaderCell></CTableHeaderCell>
@@ -133,12 +203,13 @@ export default function BanHangScreen() {
                 <CTableDataCell>{idx + 1}</CTableDataCell>
                 <CTableDataCell>
                   <CFormInput
-                    value={sp.ten} size="sm"
+                    value={sp.name} size="sm"
 
-                    onChange={(e) => handleChange(idx, 'ten', e.target.value)}
-                    placeholder="Nhập tên dịch vụ"
+                    onChange={(e) => handleChange(idx, 'name', e.target.value)}
+                    placeholder="Nhập tên khách hàng"
                   />
-                </CTableDataCell>                <CTableDataCell>
+                </CTableDataCell>
+                <CTableDataCell>
                   <div className="d-flex gap-2">
                     <CFormSelect
                       size="sm"
@@ -166,11 +237,17 @@ export default function BanHangScreen() {
                     </CFormSelect>
                   </div>
                 </CTableDataCell>
-
                 <CTableDataCell>
-                  <CButton size="sm" onClick={() => handleThayDoiSoLuong(sp.id, -1)}><CIcon icon={cilMinus} /></CButton>
+                  {/* <CButton size="sm" onClick={() => handleThayDoiSoLuong(sp.id, -1)}><CIcon icon={cilMinus} /></CButton> */}
                   <span className="mx-2">{sp.soLuong}</span>
-                  <CButton size="sm" onClick={() => handleThayDoiSoLuong(sp.id, 1)}><CIcon icon={cilPlus} /></CButton>
+                  {/* <CButton size="sm" onClick={() => handleThayDoiSoLuong(sp.id, 1)}><CIcon icon={cilPlus} /></CButton> */}
+                </CTableDataCell>
+                <CTableDataCell style={{ textAlign: 'center' }}>
+                  <CFormCheck
+                    type="checkbox"
+                    checked={sp.kyc}
+                    onChange={(e) => handleChange(idx, 'kyc', e.target.checked)}
+                  />
                 </CTableDataCell>
                 <CTableDataCell>
                   <CFormInput size="sm"
@@ -179,7 +256,7 @@ export default function BanHangScreen() {
                     onChange={(e) => handleChange(idx, 'donGia', parseFloat(e.target.value) || 0)}
                     placeholder="Nhập đơn giá"
                   />
-                </CTableDataCell>                
+                </CTableDataCell>
                 <CTableDataCell>{(sp.donGia * sp.soLuong).toLocaleString()}</CTableDataCell>
                 <CTableDataCell>
                   <CButton color="danger" size="sm" onClick={() => handleXoa(sp.id)}>
@@ -191,13 +268,67 @@ export default function BanHangScreen() {
           </CTableBody>
         </CTable>
 
+        <CCard>
+          <CCardBody style={{paddingTop: '0px'}}>
+            <CRow>
+              <CCol md={12}>
+                <div className="text-end mt-3">
+                  <div className="mb-2 d-inline-block">
+                    <strong>Giảm giá: </strong>
+                    <CFormInput
+                      style={{ width: '150px', display: 'inline-block' }}
+                      size="sm"
+                      type="number"
+                      value={giamGia}
+                      onChange={(e) => setGiamGia(parseFloat(e.target.value) || '')}
+                      placeholder="Nhập giảm giá"
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <CFormCheck
+                      inline
+                      type="radio"
+                      name="pttt"
+                      label="Tiền mặt"
+                      value="tienmat"
+                      checked={phuongThucThanhToan === 'tienmat'}
+                      onChange={(e) => setPhuongThucThanhToan(e.target.value)}
+                    />
+                    <CFormCheck
+                      inline
+                      type="radio"
+                      name="pttt"
+                      label="Chuyển khoản"
+                      value="chuyenkhoan"
+                      checked={phuongThucThanhToan === 'chuyenkhoan'}
+                      onChange={(e) => setPhuongThucThanhToan(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+              </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
+
         <div className="text-end mt-3">
           <strong>Tổng cộng: </strong>
           <span className="text-success fs-5">{tongTien.toLocaleString()} đ</span>
         </div>
 
         <div className="text-end mt-2">
-          <CButton onClick={() => console.log(dichVuDaChon)} color="success" style={{ color: 'white' }} size="lg">Thanh toán {tongTien.toLocaleString()} đ</CButton>
+          {/* <CButton onClick={() => console.log(dichVuDaChon)} color="success" style={{ color: 'white' }} size="lg">Thanh toán {tongTien.toLocaleString()} đ</CButton> */}
+          <CButton
+            onClick={() => 
+              saveSell()
+            }
+            color="success"
+            style={{ color: 'white' }}
+            size="lg"
+          >
+            Thanh toán {tongTienSauGiamGia.toLocaleString()} đ
+          </CButton>
+
         </div>
       </CCol>
     </CRow>
