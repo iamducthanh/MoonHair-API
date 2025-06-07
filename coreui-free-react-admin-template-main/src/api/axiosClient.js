@@ -11,14 +11,10 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(
     (config) => {        
-        const token = localStorage.getItem('accessToken'); // Lấy token từ localStorage
-        console.log(token);
-        
+        const token = localStorage.getItem('accessToken'); // Lấy token từ localStorage        
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`; // Thêm token vào header
         }
-        console.log('Request Headers:', config.headers);
-
         return config;
     },
     (error) => {

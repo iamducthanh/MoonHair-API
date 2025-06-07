@@ -122,8 +122,15 @@ export default function BanHangScreen() {
     console.log(obj)
 
     const services = await sellApi.saveSell(obj)
-    
+
   }
+
+  const handlePayment = async () => {
+    const res = await sellApi.paymentVnpay("237492439998", 5000);
+    console.log(res.data.url);
+    window.location.href = res.data.url; // chuyển hướng đến trang thanh toán VNPAY
+  };
+
 
   return (
     <CRow>
