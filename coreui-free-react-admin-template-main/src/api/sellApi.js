@@ -6,6 +6,9 @@ const sellApi = {
     },
     getAllServiceSell(branchId) {
         return axiosClient.get(`/api/sell/service-list?branchId=${branchId}`);
+    },
+    paymentVnpay(orderId, amount) {
+        return axiosClient.get(`/api/payment/create-payment?orderId=${orderId}&amountIn=${amount}`);
     }
 };
 

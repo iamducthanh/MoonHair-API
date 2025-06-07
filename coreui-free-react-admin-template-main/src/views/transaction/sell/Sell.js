@@ -121,7 +121,15 @@ export default function BanHangScreen() {
     console.log('Chi tiết:', dichVuDaChon)
     console.log('Giảm giá:', giamGia)
     console.log('Phương thức:', phuongThucThanhToan)
+    handlePayment()
   }
+
+  const handlePayment = async () => {
+    const res = await sellApi.paymentVnpay("237492439998", 5000);
+    console.log(res.data.url);
+    window.location.href = res.data.url; // chuyển hướng đến trang thanh toán VNPAY
+  };
+  
 
   return (
     <CRow>
