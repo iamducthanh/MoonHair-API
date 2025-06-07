@@ -1,5 +1,6 @@
 package com.moonhair.moonhair.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,8 +38,9 @@ public class EmployeeEntity {
     private LocalDate modifiedDate;
 
     @Column(name = "ten_dang_nhap")
+    @JsonIgnore
     private String username;
-
+    @JsonIgnore
     @Column(name = "mat_khau")
     private String password;
 

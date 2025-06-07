@@ -76,6 +76,29 @@ ADD COLUMN ten_san_pham varchar(255);
 ALTER TABLE nhan_vien MODIFY COLUMN id_chi_nhanh INT NULL;
 ALTER TABLE nhan_vien ADD COLUMN loai VARCHAR(10);
 
+-- 31/05
+CREATE TABLE hoa_don (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    ten_khach VARCHAR(255),
+    tong_tien DECIMAL(15,2),
+    giam_gia DECIMAL(15,2),
+    tong_tien_thanh_toan DECIMAL(15,2),
+    phuong_thuc VARCHAR(100),
+   	`id_chi_nhanh` int NOT NULL,
+
+);
+CREATE TABLE hoa_don_chi_tiet (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    ten_khach_san_pham VARCHAR(255),
+    tho_chinh VARCHAR(255),
+    tho_phu VARCHAR(255),
+    so_luong INT,
+    khach_yc TEXT,
+    don_gia DECIMAL(15,2),
+    thanh_tien DECIMAL(15,2),
+    hoa_don_id BIGINT,
+    FOREIGN KEY (hoa_don_id) REFERENCES hoa_don(id)
+);
 
 
 

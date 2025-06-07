@@ -1,12 +1,11 @@
 package com.moonhair.moonhair.api;
 
 import com.moonhair.moonhair.dto.ProductList;
+import com.moonhair.moonhair.dto.Sell;
 import com.moonhair.moonhair.entities.ProductEntity;
 import com.moonhair.moonhair.service.ISellService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,4 +27,12 @@ public class SellController {
     public List<ProductEntity> getAllServiceToSell(@RequestParam Integer branchId) {
         return sellService.getAllServiceToSell(branchId);
     }
+
+    @PostMapping("save")
+    public ResponseEntity<?> saveSell(@RequestBody Sell sell) {
+        System.out.println(sell);
+        // Xử lý logic ở đây...
+        return ResponseEntity.ok("Đã lưu thành công!");
+    }
+
 }

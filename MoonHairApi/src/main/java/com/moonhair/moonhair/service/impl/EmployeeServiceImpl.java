@@ -47,6 +47,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
             updatedEmployee.setBranchId(employee.getBranchId());
             updatedEmployee.setActive(employee.getActive());
             updatedEmployee.setModifiedDate(employee.getModifiedDate());
+            updatedEmployee.setType(employee.getType());
             return employeeRepository.save(updatedEmployee);
         }
         throw new RuntimeException("Employee not found");

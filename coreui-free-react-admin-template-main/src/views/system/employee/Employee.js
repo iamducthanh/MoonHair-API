@@ -84,6 +84,7 @@ const Employee = () => {
                                     <CTableHeaderCell>STT</CTableHeaderCell>
                                     <CTableHeaderCell>Tên</CTableHeaderCell>
                                     <CTableHeaderCell>Mức Lương</CTableHeaderCell>
+                                    <CTableHeaderCell>Loại</CTableHeaderCell>
                                     <CTableHeaderCell>Ngày thêm</CTableHeaderCell>
                                     <CTableHeaderCell>Ngày sửa</CTableHeaderCell>
                                     <CTableHeaderCell>Hành động</CTableHeaderCell>
@@ -95,6 +96,7 @@ const Employee = () => {
                                         <CTableHeaderCell>{index + 1}</CTableHeaderCell>
                                         <CTableDataCell>{employee.name}</CTableDataCell>
                                         <CTableDataCell>{employee.salaryRate}</CTableDataCell>
+                                        <CTableDataCell>{employee.type == 'CHINH' ? 'Chính' : employee.type == 'PHU' ? 'Phụ' : ''}</CTableDataCell>
                                         <CTableDataCell>{employee.createdDate ? format(new Date(employee.createdDate), 'dd/MM/yyyy') : ''}</CTableDataCell>
                                         <CTableDataCell>{employee.modifiedDate ? format(new Date(employee.modifiedDate), 'dd/MM/yyyy') : ''}</CTableDataCell>
                                         <CTableDataCell>

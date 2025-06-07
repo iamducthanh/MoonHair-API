@@ -18,12 +18,6 @@ export default function BanHangScreen() {
   const [giamGia, setGiamGia] = useState(0);
   const [phuongThucThanhToan, setPhuongThucThanhToan] = useState('tienmat'); // 'tienmat' hoặc 'chuyenkhoan'
   const [dichVuDaChon, setDichVuDaChon] = useState([])
-  const nhanVienList = [
-    { id: 'NV001', tenNhanVien: 'Nguyễn Văn A' },
-    { id: 'NV002', tenNhanVien: 'Trần Thị B' },
-    { id: 'NV003', tenNhanVien: 'Lê Văn C' },
-    { id: 'NV004', tenNhanVien: 'Phạm Thị D' },
-  ];
   const tongTien = dichVuDaChon.reduce((sum, sp) => sum + sp.soLuong * sp.donGia, 0)
   const tongTienSauGiamGia = Math.max(tongTien - giamGia, 0);
   const [employees, setEmployees] = useState([]);
@@ -115,12 +109,20 @@ export default function BanHangScreen() {
       return v.toString(16);
     });
   }
-  
 
-  const saveSell = () => {
-    console.log('Chi tiết:', dichVuDaChon)
-    console.log('Giảm giá:', giamGia)
-    console.log('Phương thức:', phuongThucThanhToan)
+
+  const saveSell = async () => {
+    let obj = {};
+    obj.productList = dichVuDaChon
+    obj.phuongThucThanhToan = phuongThucThanhToan;
+    obj.tongTien = tongTien;
+    obj.tongTienThanhToan = tongTienSauGiamGia;
+    obj.idChiNhanh = selectedBranchLocal
+    obj.giamGia = giamGia;
+    console.log(obj)
+
+    const services = await sellApi.saveSell(obj)
+    
   }
 
   return (
@@ -213,27 +215,29 @@ export default function BanHangScreen() {
                   <div className="d-flex gap-2">
                     <CFormSelect
                       size="sm"
-                      value={sp.nhanVien1 || ''}
-                      onChange={(e) => handleChangeNhanVien(idx, 'nhanVien1', e.target.value)}
+                      value={sp.thoChinh || ''}
+                      onChange={(e) => handleChangeNhanVien(idx, 'thoChinh', e.target.value)}
                     >
                       <option value="">Thợ chính</option>
-                      {nhanVienList.map((nv) => (
-                        <option key={nv.id} value={nv.id}>
-                          {nv.tenNhanVien}
-                        </option>
-                      ))}
+                      {employees.filter((nv) => nv.type === 'CHINH')
+                        .map((nv) => (
+                          <option key={nv.id} value={nv.id}>
+                            {nv.name}
+                          </option>
+                        ))}
                     </CFormSelect>
                     <CFormSelect
                       size="sm"
-                      value={sp.nhanVien2 || ''}
-                      onChange={(e) => handleChangeNhanVien(idx, 'nhanVien2', e.target.value)}
+                      value={sp.thoPhu || ''}
+                      onChange={(e) => handleChangeNhanVien(idx, 'thoPhu', e.target.value)}
                     >
                       <option value="">Thợ phụ</option>
-                      {nhanVienList.map((nv) => (
-                        <option key={nv.id} value={nv.id}>
-                          {nv.tenNhanVien}
-                        </option>
-                      ))}
+                      {employees.filter((nv) => nv.type === 'PHU')
+                        .map((nv) => (
+                          <option key={nv.id} value={nv.id}>
+                            {nv.name}
+                          </option>
+                        ))}
                     </CFormSelect>
                   </div>
                 </CTableDataCell>
@@ -269,7 +273,7 @@ export default function BanHangScreen() {
         </CTable>
 
         <CCard>
-          <CCardBody style={{paddingTop: '0px'}}>
+          <CCardBody style={{ paddingTop: '0px' }}>
             <CRow>
               <CCol md={12}>
                 <div className="text-end mt-3">
@@ -319,7 +323,7 @@ export default function BanHangScreen() {
         <div className="text-end mt-2">
           {/* <CButton onClick={() => console.log(dichVuDaChon)} color="success" style={{ color: 'white' }} size="lg">Thanh toán {tongTien.toLocaleString()} đ</CButton> */}
           <CButton
-            onClick={() => 
+            onClick={() =>
               saveSell()
             }
             color="success"

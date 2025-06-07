@@ -6,6 +6,9 @@ const sellApi = {
     },
     getAllServiceSell(branchId) {
         return axiosClient.get(`/api/sell/service-list?branchId=${branchId}`);
+    },
+    saveSell(sell) {
+        return axiosClient.post(`/api/sell/save`, sell);
     }
 };
 

@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import Employee from './Employee';
 
 const EmployeeAdd = () => {
-    const [employee, setEmployee] = useState({ name: '', salaryRate: '', branchId: '' });
+    const [employee, setEmployee] = useState({ name: '', salaryRate: '', branchId: '', type: 'CHINH' });
     const [branches, setBranches] = useState([]);
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
@@ -29,7 +29,17 @@ const EmployeeAdd = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setEmployee((prev) => ({ ...prev, [name]: value }));
+
+        setEmployee((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        if (name == 'type') {
+            employee.type = value
+        }
+
+        console.log(employee)
     };
 
     const validate = () => {
@@ -75,7 +85,11 @@ const EmployeeAdd = () => {
                                 ))}
                             </CFormSelect>
                             {errors.branchId && <p style={{ color: 'red' }}>{errors.branchId}</p>}
-
+                            <CFormLabel htmlFor="type">Loại</CFormLabel>
+                            <CFormSelect id="type" name="type" value={employee.type} onChange={handleChange} required>
+                                <option key='CHINH' value='CHINH'>Chính</option>
+                                <option key='PHU' value='PHU'>Phụ</option>
+                            </CFormSelect>
                             <CButton type="submit" color="success" className="mt-3">Lưu</CButton>
                             <CButton type="button" color="secondary" className="mt-3 ms-2" onClick={() => navigate('/system/employee')}>Hủy</CButton>
                         </CForm>
