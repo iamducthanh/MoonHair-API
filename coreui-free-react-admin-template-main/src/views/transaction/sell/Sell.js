@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react'
 import sellApi from '../../../api/sellApi';
 import { useAppContext } from '../../../context/AppContext';
 import employeeApi from '../../../api/employeeApi';
+import { toast } from 'react-toastify';
 
 export default function BanHangScreen() {
   const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
@@ -16,6 +17,7 @@ export default function BanHangScreen() {
   const [danhSachDichVu, setDanhSachDichVu] = useState([])
   const [expandedProductId, setExpandedProductId] = useState([])
   const [giamGia, setGiamGia] = useState(0);
+  const [tenKhachHang, setTenKhachHang] = useState('');
   const [phuongThucThanhToan, setPhuongThucThanhToan] = useState('tienmat'); // 'tienmat' hoặc 'chuyenkhoan'
   const [dichVuDaChon, setDichVuDaChon] = useState([])
   const tongTien = dichVuDaChon.reduce((sum, sp) => sum + sp.soLuong * sp.donGia, 0)
@@ -81,7 +83,7 @@ export default function BanHangScreen() {
     setDichVuDaChon(newList);
   };
 
-  const [loaiTab, setLoaiTab] = useState('sanpham') // hoặc 'dichvu'
+  const [loaiTab, setLoaiTab] = useState('dichvu') // hoặc 'dichvu'
 
   const handleThemSanPham = () => {
     const sanPhamMoi = {
@@ -119,17 +121,38 @@ export default function BanHangScreen() {
     obj.tongTienThanhToan = tongTienSauGiamGia;
     obj.idChiNhanh = selectedBranchLocal
     obj.giamGia = giamGia;
+    obj.tenKhachHang = tenKhachHang;
     console.log(obj)
 
-    const services = await sellApi.saveSell(obj)
+    try {
+      const sell = await sellApi.saveSell(obj);
+      if (obj.phuongThucThanhToan == 'chuyenkhoan') {
+        let idHoaDon = sell.data.idHoaDon
+        const res = await sellApi.paymentVnpay(sell.data.idHoaDon, sell.data.tongTienThanhToan);
+        window.open(res.data.url, '_blank');
+      } else {
+      }
+      // 👉 Reset sau khi lưu
+      toast.success("Thành công!");
+      resetForm();
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi lưu!');
+    }
+
 
   }
 
   const handlePayment = async () => {
-    const res = await sellApi.paymentVnpay("237492439998", 5000);
-    console.log(res.data.url);
-    window.location.href = res.data.url; // chuyển hướng đến trang thanh toán VNPAY
+
   };
+
+  const resetForm = () => {
+    setDichVuDaChon([]);
+    setTenKhachHang('');
+    setGiamGia(0);
+    setPhuongThucThanhToan('tienmat');
+  };
+
 
 
   return (
@@ -154,7 +177,7 @@ export default function BanHangScreen() {
             size="sm" color="success" style={{ color: 'white' }}>+ Thêm</CButton>
 
         </div>
-        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+        <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {/* Danh sách sản phẩm */}
           <div style={{ display: loaiTab === 'sanpham' ? 'block' : 'none' }}>
             {danhSachSanPham.map((item) => (
@@ -197,7 +220,7 @@ export default function BanHangScreen() {
           <CTableHead>
             <CTableRow>
               <CTableHeaderCell>#</CTableHeaderCell>
-              <CTableHeaderCell>Sản phẩm/khách hàng</CTableHeaderCell>
+              <CTableHeaderCell>Sản phẩm/Dịch vụ</CTableHeaderCell>
               <CTableHeaderCell>Nhân viên</CTableHeaderCell>
               <CTableHeaderCell>SL</CTableHeaderCell>
               <CTableHeaderCell>KYC</CTableHeaderCell>
@@ -211,12 +234,14 @@ export default function BanHangScreen() {
               <CTableRow key={sp.id}>
                 <CTableDataCell>{idx + 1}</CTableDataCell>
                 <CTableDataCell>
-                  <CFormInput
-                    value={sp.name} size="sm"
-
-                    onChange={(e) => handleChange(idx, 'name', e.target.value)}
-                    placeholder="Nhập tên khách hàng"
-                  />
+                  {sp.productCode !== 'SPM000' && (
+                    <CFormInput
+                      value={sp.name}
+                      size="sm"
+                      onChange={(e) => handleChange(idx, 'name', e.target.value)}
+                      placeholder="Nhập tên khách hàng"
+                    />
+                  )}
                 </CTableDataCell>
                 <CTableDataCell>
                   <div className="d-flex gap-2">
@@ -250,7 +275,10 @@ export default function BanHangScreen() {
                 </CTableDataCell>
                 <CTableDataCell>
                   {/* <CButton size="sm" onClick={() => handleThayDoiSoLuong(sp.id, -1)}><CIcon icon={cilMinus} /></CButton> */}
-                  <span className="mx-2">{sp.soLuong}</span>
+                  {sp.productCode !== 'SPM000' && (
+
+                    <span className="mx-2">{sp.soLuong}</span>
+                  )}
                   {/* <CButton size="sm" onClick={() => handleThayDoiSoLuong(sp.id, 1)}><CIcon icon={cilPlus} /></CButton> */}
                 </CTableDataCell>
                 <CTableDataCell style={{ textAlign: 'center' }}>
@@ -287,12 +315,23 @@ export default function BanHangScreen() {
                   <div className="mb-2 d-inline-block">
                     <strong>Giảm giá: </strong>
                     <CFormInput
-                      style={{ width: '150px', display: 'inline-block' }}
+                      style={{ width: '250px', height: '40px', display: 'inline-block' }}
                       size="sm"
                       type="number"
                       value={giamGia}
                       onChange={(e) => setGiamGia(parseFloat(e.target.value) || '')}
                       placeholder="Nhập giảm giá"
+                    />
+                  </div> <br />
+                  <div className="mb-2 d-inline-block">
+                    <strong>Tên khách hàng: </strong>
+                    <CFormInput
+                      style={{ width: '250px', height: '40px', display: 'inline-block' }}
+                      size="sm"
+                      type="text"
+                      value={tenKhachHang}
+                      onChange={(e) => setTenKhachHang(e.target.value || '')}
+                      placeholder="Nhập tên khách hàng"
                     />
                   </div>
                   <div className="mt-2">
@@ -339,7 +378,6 @@ export default function BanHangScreen() {
           >
             Thanh toán {tongTienSauGiamGia.toLocaleString()} đ
           </CButton>
-
         </div>
       </CCol>
     </CRow>

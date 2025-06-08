@@ -6,7 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "bang_chi_tiet")
+@Table(name = "hoa_don_chi_tiet")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -41,6 +41,8 @@ public class HoaDonChiTietEntity {
 
     @Column(name = "hoa_don_id")
     private Long hoaDonId;
+
+    private String loai;
 
     // Getters & Setters
 }

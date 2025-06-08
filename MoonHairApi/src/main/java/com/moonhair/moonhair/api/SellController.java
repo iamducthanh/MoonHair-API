@@ -30,9 +30,8 @@ public class SellController {
 
     @PostMapping("save")
     public ResponseEntity<?> saveSell(@RequestBody Sell sell) {
-        System.out.println(sell);
-        // Xử lý logic ở đây...
-        return ResponseEntity.ok("Đã lưu thành công!");
+        sellService.saveSell(sell);
+        return ResponseEntity.ok(sell);
     }
 
 }

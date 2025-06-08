@@ -34,5 +34,13 @@ public class HoaDonEntity {
     @Column(name = "phuong_thuc")
     private String phuongThuc;
 
+    @Column(name = "trang_thai_thanh_toan")
+    private String trangThaiThanhToan;
+
+    private Long idChiNhanh;
+
+    private String ghiChuThanhToan;
+
+    private String nguoiTaoDon;
 }
 

@@ -99,6 +99,12 @@ CREATE TABLE hoa_don_chi_tiet (
     hoa_don_id BIGINT,
     FOREIGN KEY (hoa_don_id) REFERENCES hoa_don(id)
 );
+-- 07/06
+ALTER TABLE hoa_don ADD COLUMN trang_thai_thanh_toan VARCHAR(10);
+ALTER TABLE hoa_don_chi_tiet ADD COLUMN loai VARCHAR(10);
+ALTER TABLE hoa_don ADD COLUMN ghi_chu_thanh_toan VARCHAR(200);
+ALTER TABLE hoa_don ADD COLUMN nguoi_tao_don VARCHAR(20);
+
 
 
 

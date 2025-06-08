@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF nếu không dùng
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/auth/login").permitAll() // Cho phép login không cần token
                         .requestMatchers("/api/**").authenticated() // Các API khác cần token
+                        .requestMatchers("/api/payment/**").permitAll() // Các API khác cần token
                         .anyRequest().permitAll());
 
         return http.build();

@@ -10,10 +10,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Sell {
+    private Long idHoaDon;
     private String phuongThucThanhToan;
     private Double tongTien;
     private Double tongTienThanhToan;
     private Double giamGia;
-    private List<SellDetail> productList;hhyyyyyyyyyghyyhhhhhhgggggggtttttttttttttttttttttttt
+    private String tenKhachHang;
+    private Long idChiNhanh;
+    private List<SellDetail> productList;
 }
-†††

@@ -8,16 +8,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SellDetail {
-    String thoChinh;
-    String thoPhu;
-    // dịch vụ
-    String productType;
-    String productCode;
-    Integer soLuong;
-    Double donGia;
-    String name;
-    // sản phẩm
-    Integer lotId;
-    String lotCode;
-    Boolean kyc;
+    private String thoChinh;
+    private String thoPhu;
+    private String productType;
+    private String productCode;
+    private Integer soLuong;
+    private Double donGia;
+    private String name;
+    private Integer lotId;
+    private String lotCode;
+    private Boolean kyc;
 }

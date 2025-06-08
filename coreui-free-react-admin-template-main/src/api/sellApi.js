@@ -11,7 +11,10 @@ const sellApi = {
         return axiosClient.post(`/api/sell/save`, sell);
     },
     paymentVnpay(orderId, amount) {
-        return axiosClient.get(`/api/payment/create-payment?orderId=${orderId}&amountIn=${amount}`);
+        return axiosClient.get(`/payment/create-payment?orderId=${orderId}&amountIn=${amount}`);
+    },
+    paymentResult(param) {
+        return axiosClient.get(`/payment/payment-result?${param}`);
     }
 };
 

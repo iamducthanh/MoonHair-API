@@ -18,7 +18,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
     List<ProductSearch> searchByKeyword(String keyword, Integer branchId, Pageable pageable);
     @Query("select new com.moonhair.moonhair.dto.ProductList(o.id, o.name, a.id, a.lotCode, o.size, a.costPrice, a.sellingPrice, a.quantityImported, a.quantityRemaining, a.importDate, o.active) from ProductEntity o left join LotEntity a on o.id = a.productId where o.branchId = ?1 and o.productType = 'SAN_PHAM' and o.deleteFlag = false")
     List<ProductList> findAllProductListByBranch(Integer branchId);
-    @Query("select new com.moonhair.moonhair.dto.ProductList(o.id, o.name, a.id, a.lotCode, o.size, a.costPrice, a.sellingPrice, a.quantityImported, a.quantityRemaining, a.importDate, o.active) from ProductEntity o left join LotEntity a on o.id = a.productId where o.branchId = ?1 and o.productType = 'SAN_PHAM' and o.deleteFlag = false and o.active = true and a.sellingPrice is not null")
+    @Query("select new com.moonhair.moonhair.dto.ProductList(o.id, o.name, a.id, a.lotCode, o.size, a.costPrice, a.sellingPrice, a.quantityImported, a.quantityRemaining, a.importDate, o.active, o.productType) from ProductEntity o left join LotEntity a on o.id = a.productId where o.branchId = ?1 and o.productType = 'SAN_PHAM' and o.deleteFlag = false and o.active = true and a.sellingPrice is not null")
     List<ProductList> findAllProductListToSell(Integer branchId);
     @Query("select o from ProductEntity o where o.active = true and o.productType = 'DICH_VU' and o.deleteFlag = false and o.branchId = ?1")
     List<ProductEntity> findAllProductService(Integer branchId);

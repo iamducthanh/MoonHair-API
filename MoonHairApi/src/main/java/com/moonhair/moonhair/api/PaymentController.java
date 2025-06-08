@@ -1,6 +1,8 @@
 package com.moonhair.moonhair.api;
 
 import com.moonhair.moonhair.config.Config;
+import com.moonhair.moonhair.entities.HoaDonEntity;
+import com.moonhair.moonhair.repositories.HoaDonRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +29,13 @@ import static com.moonhair.moonhair.config.Config.Sha256;
 import static com.moonhair.moonhair.config.Config.vnp_HashSecret;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/payment")
 public class PaymentController {
     @Autowired
     private HttpServletRequest req;
+
+    @Autowired
+    private HoaDonRepository hoaDonRepository;
 
     @GetMapping("/create-payment")
     public ResponseEntity<?> createPayment(@RequestParam String orderId, @RequestParam String amountIn) throws Exception {
@@ -39,8 +44,6 @@ public class PaymentController {
         String orderType = "other";
         long amount = Integer.parseInt(req.getParameter("amountIn"))*100;
         String bankCode = req.getParameter("bankCode");
-
-        String vnp_TxnRef = Config.getRandomNumber(8);
         String vnp_IpAddr = Config.getIpAddress(req);
 
         String vnp_TmnCode = Config.vnp_TmnCode;
@@ -55,8 +58,8 @@ public class PaymentController {
         if (bankCode != null && !bankCode.isEmpty()) {
             vnp_Params.put("vnp_BankCode", bankCode);
         }
-        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "ThanhToanDonHang" + vnp_TxnRef);
+        vnp_Params.put("vnp_TxnRef", orderId);
+        vnp_Params.put("vnp_OrderInfo", "Thanh_Toan_Don_Hang_" + orderId);
         vnp_Params.put("vnp_OrderType", orderType);
 
         String locate = req.getParameter("language");
@@ -121,9 +124,61 @@ public class PaymentController {
                 .map(e -> e.getKey() + "=" + e.getValue())
                 .collect(Collectors.joining("&"));
 
-        String myChecksum = Sha256(vnp_HashSecret + signData);
+        String myChecksum = Config.hmacSHA512(Config.secretKey, signData);
 
         if (myChecksum.equals(secureHash)) {
+            String responseCode = fields.get("vnp_ResponseCode");
+            Long hoaDonId = Long.valueOf(fields.get("vnp_TxnRef"));
+
+            HoaDonEntity hoaDon = hoaDonRepository.findById(hoaDonId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn với mã: " + hoaDonId));
+
+            if ("00".equals(responseCode)) {
+                hoaDon.setTrangThaiThanhToan("100"); // Thành công
+                hoaDon.setGhiChuThanhToan("Thành công");
+            } else {
+                hoaDon.setTrangThaiThanhToan("400"); // Thất bại
+                switch (responseCode) {
+                    case "07":
+                        hoaDon.setGhiChuThanhToan("Giao dịch bị nghi ngờ (liên quan tới lừa đảo, bất thường)");
+                        break;
+                    case "09":
+                        hoaDon.setGhiChuThanhToan("Thẻ/Tài khoản chưa đăng ký InternetBanking");
+                        break;
+                    case "10":
+                        hoaDon.setGhiChuThanhToan("Xác thực thông tin thẻ sai quá 3 lần");
+                        break;
+                    case "11":
+                        hoaDon.setGhiChuThanhToan("Hết hạn chờ thanh toán");
+                        break;
+                    case "12":
+                        hoaDon.setGhiChuThanhToan("Thẻ/Tài khoản bị khóa");
+                        break;
+                    case "13":
+                        hoaDon.setGhiChuThanhToan("Sai mật khẩu xác thực giao dịch (OTP)");
+                        break;
+                    case "24":
+                        hoaDon.setGhiChuThanhToan("Khách hàng hủy giao dịch");
+                        break;
+                    case "51":
+                        hoaDon.setGhiChuThanhToan("Không đủ số dư tài khoản");
+                        break;
+                    case "65":
+                        hoaDon.setGhiChuThanhToan("Vượt quá hạn mức giao dịch trong ngày");
+                        break;
+                    case "75":
+                        hoaDon.setGhiChuThanhToan("Ngân hàng đang bảo trì");
+                        break;
+                    case "79":
+                        hoaDon.setGhiChuThanhToan("Nhập sai mật khẩu thanh toán quá số lần quy định");
+                        break;
+                    case "99":
+                    default:
+                        hoaDon.setGhiChuThanhToan("Giao dịch thất bại - lỗi khác");
+                        break;
+                }
+            }
+            hoaDonRepository.save(hoaDon);
             // Xác thực thành công, xử lý cập nhật đơn hàng
             return ResponseEntity.ok("Payment successful");
         } else {
