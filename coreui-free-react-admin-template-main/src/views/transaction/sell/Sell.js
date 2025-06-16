@@ -55,7 +55,6 @@ export default function BanHangScreen() {
       name = item.name;
       price = item.price;
     }
-    console.log(name)
     if (existed) {
       setDichVuDaChon(dichVuDaChon.map(sp =>
         sp.id === item.id ? { ...sp, soLuong: sp.soLuong + 1, donGia: price, name: name } : sp
@@ -135,6 +134,7 @@ export default function BanHangScreen() {
       // 👉 Reset sau khi lưu
       toast.success("Thành công!");
       resetForm();
+      fetchProduct();
     } catch (error) {
       toast.error('Có lỗi xảy ra khi lưu!');
     }

@@ -79,6 +79,7 @@ const ProductList = () => {
     }
 
     const handleUpdate = (product, editMode) => {
+        console.log(product);
         setEditMode(editMode)
         setFormData(product)
     }
@@ -162,6 +163,7 @@ const ProductList = () => {
                                                                     <CCol md={1}><strong>Ngày nhập:</strong></CCol>
                                                                     <CCol md={5}>{new Date(p.importDate).toLocaleString()}</CCol>
                                                                 </CRow>
+                                                                <p>{p.lotId}</p>
                                                                 <CRow>
                                                                     <CCol md={12} className="text-end">
                                                                         {editMode ? (

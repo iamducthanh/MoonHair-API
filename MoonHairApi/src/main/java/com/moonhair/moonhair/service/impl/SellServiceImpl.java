@@ -4,12 +4,10 @@ import com.moonhair.moonhair.constant.PaymentStatus;
 import com.moonhair.moonhair.dto.CustomUserDetails;
 import com.moonhair.moonhair.dto.ProductList;
 import com.moonhair.moonhair.dto.Sell;
-import com.moonhair.moonhair.entities.EmployeeEntity;
-import com.moonhair.moonhair.entities.HoaDonChiTietEntity;
-import com.moonhair.moonhair.entities.HoaDonEntity;
-import com.moonhair.moonhair.entities.ProductEntity;
+import com.moonhair.moonhair.entities.*;
 import com.moonhair.moonhair.repositories.HoaDonChiTietRepository;
 import com.moonhair.moonhair.repositories.HoaDonRepository;
+import com.moonhair.moonhair.repositories.LotRepository;
 import com.moonhair.moonhair.repositories.ProductRepository;
 import com.moonhair.moonhair.service.ISellService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,17 +17,20 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SellServiceImpl implements ISellService {
     private final ProductRepository productRepository;
     private final HoaDonRepository hoaDonRepository;
     private final HoaDonChiTietRepository hoaDonChiTietRepository;
+    private final LotRepository lotRepository;
 
-    public SellServiceImpl(ProductRepository productRepository, HoaDonRepository hoaDonRepository, HoaDonChiTietRepository hoaDonChiTietRepository) {
+    public SellServiceImpl(ProductRepository productRepository, HoaDonRepository hoaDonRepository, HoaDonChiTietRepository hoaDonChiTietRepository, LotRepository lotRepository) {
         this.productRepository = productRepository;
         this.hoaDonRepository = hoaDonRepository;
         this.hoaDonChiTietRepository = hoaDonChiTietRepository;
+        this.lotRepository = lotRepository;
     }
 
 
@@ -63,6 +64,7 @@ public class SellServiceImpl implements ISellService {
 
         HoaDonEntity hoaDon = hoaDonRepository.save(hoaDonEntity);
         List<HoaDonChiTietEntity> hoaDonChiTiets = new ArrayList<>();
+        List<LotEntity> lotList = new ArrayList<>();
         sell.getProductList().forEach(o -> {
             HoaDonChiTietEntity hoaDonChiTietEntity = HoaDonChiTietEntity.builder()
                     .tenKhachSanPham(o.getName())
@@ -76,8 +78,16 @@ public class SellServiceImpl implements ISellService {
                     .loai(o.getProductType())
                     .build();
             hoaDonChiTiets.add(hoaDonChiTietEntity);
+            if (o.getLotId() != null && o.getProductType().equals("SAN_PHAM")) {
+                LotEntity lot = lotRepository.findById(o.getLotId())
+                        .filter(oo -> oo.getQuantityRemaining() != null && oo.getQuantityRemaining() > 0)
+                        .orElseThrow(() -> new RuntimeException("Sản phẩm này đã hết hàng!"));
+                lot.setQuantityRemaining(lot.getQuantityRemaining() - o.getSoLuong());
+                lotList.add(lot);
+            }
         });
         hoaDonChiTietRepository.saveAll(hoaDonChiTiets);
+        lotRepository.saveAll(lotList);
         sell.setIdHoaDon(hoaDon.getId());
         return sell;
     }
