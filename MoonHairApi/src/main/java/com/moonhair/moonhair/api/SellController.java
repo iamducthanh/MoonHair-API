@@ -1,5 +1,6 @@
 package com.moonhair.moonhair.api;
 
+import com.moonhair.moonhair.dto.GetSellListDto;
 import com.moonhair.moonhair.dto.ProductList;
 import com.moonhair.moonhair.dto.Sell;
 import com.moonhair.moonhair.entities.ProductEntity;
@@ -32,6 +33,11 @@ public class SellController {
     public ResponseEntity<?> saveSell(@RequestBody Sell sell) {
         sellService.saveSell(sell);
         return ResponseEntity.ok(sell);
+    }
+
+    @PostMapping("get-sell-list")
+    public ResponseEntity<?> getSellList(@RequestBody GetSellListDto sell) {
+        return ResponseEntity.ok(sellService.getSellList(sell));
     }
 
 }

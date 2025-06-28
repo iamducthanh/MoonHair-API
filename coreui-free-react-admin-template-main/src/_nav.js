@@ -102,7 +102,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Sổ',
-        to: '/transaction/sell',
+        to: '/transaction/accountingBooks',
       }
     ],
   },

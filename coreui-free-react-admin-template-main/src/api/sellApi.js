@@ -15,6 +15,9 @@ const sellApi = {
     },
     paymentResult(param) {
         return axiosClient.get(`/payment/payment-result?${param}`);
+    },
+    getSellList(param) {
+        return axiosClient.post(`/api/sell/get-sell-list`, param);
     }
 };
 

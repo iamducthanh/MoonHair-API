@@ -64,6 +64,7 @@ const ProductList = React.lazy(() => import('./views/productList/ProductList'))
 // transaction
 const PurchaseOrderList = React.lazy(() => import('./views/transaction/purchaseOrder/PurchaseOrderList'))
 const PurchaseOrderAdd = React.lazy(() => import('./views/transaction/purchaseOrder/PurchaseOrderAdd'))
+const AccountingBookList = React.lazy(() => import('./views/transaction/accountingBooks/AccountingBookList'))
 const Sell = React.lazy(() => import('./views/transaction/sell/Sell'))
 const ThanhToanThanhCongScreen = React.lazy(() => import('./views/transaction/sell/SellSuccess'))
 
@@ -131,6 +132,7 @@ const routes = [
   // transaction
   { path: '/transaction/purchaseOrder', name: 'Nhập hàng', element: PurchaseOrderList },
   { path: '/transaction/purchaseOrder/add', name: 'Tạo phiếu nhập', element: PurchaseOrderAdd },
+  { path: '/transaction/accountingBooks', name: 'Sổ', element: AccountingBookList },
   { path: '/transaction/sell', name: 'Bán hàng', element: Sell },
   { path: '/payment-result', name: 'Bán hàng', element: ThanhToanThanhCongScreen },
 

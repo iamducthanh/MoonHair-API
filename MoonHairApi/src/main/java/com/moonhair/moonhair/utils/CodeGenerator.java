@@ -22,5 +22,18 @@ public class CodeGenerator {
         return productCode + "-" + date + "-" + String.format("%03d", nextIndex); // SPxxx-ddMMyyyy-xxx
     }
 
+    public static String getInitials(String input) {
+        StringBuilder result = new StringBuilder();
+        // Tách từ bằng khoảng trắng
+        String[] words = input.trim().split("\\s+");
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                // Lấy ký tự đầu và viết hoa
+                result.append(Character.toUpperCase(word.charAt(0)));
+            }
+        }
+        return result.toString();
+    }
+
 
 }

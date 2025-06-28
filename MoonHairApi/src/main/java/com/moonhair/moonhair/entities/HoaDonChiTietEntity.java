@@ -39,10 +39,24 @@ public class HoaDonChiTietEntity {
     @Column(name = "thanh_tien")
     private BigDecimal thanhTien;
 
-    @Column(name = "hoa_don_id")
-    private Long hoaDonId;
+//    @Column(name = "hoa_don_id")
+//    private Long hoaDonId;
 
     private String loai;
+
+    @ManyToOne
+    @JoinColumn(name = "hoa_don_id")
+    private HoaDonEntity hoaDon;
+
+    @Column(name = "tho_chinh_ten")
+    private String thoChinhTen;
+
+    @Column(name = "tho_phu_ten")
+    private String thoPhuTen;
+
+    @Column(name = "ma_san_pham")
+    private String maSanPham;
+
 
     // Getters & Setters
 }

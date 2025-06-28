@@ -2,8 +2,12 @@ package com.moonhair.moonhair.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -13,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class HoaDonEntity {
 
     @Id
@@ -42,5 +47,14 @@ public class HoaDonEntity {
     private String ghiChuThanhToan;
 
     private String nguoiTaoDon;
+
+    private String maHoaDon;
+    @CreatedDate
+    private LocalDateTime ngayTao;
+    @LastModifiedDate
+    private LocalDateTime ngaySua;
+
+    @OneToMany(mappedBy = "hoaDon", fetch = FetchType.LAZY)
+    private List<HoaDonChiTietEntity> hoaDonChiTietList;
 }
 

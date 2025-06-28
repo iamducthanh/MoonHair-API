@@ -104,6 +104,16 @@ ALTER TABLE hoa_don ADD COLUMN trang_thai_thanh_toan VARCHAR(10);
 ALTER TABLE hoa_don_chi_tiet ADD COLUMN loai VARCHAR(10);
 ALTER TABLE hoa_don ADD COLUMN ghi_chu_thanh_toan VARCHAR(200);
 ALTER TABLE hoa_don ADD COLUMN nguoi_tao_don VARCHAR(20);
+-- 19/06
+ALTER TABLE hoa_don ADD COLUMN ma_hoa_don VARCHAR(10);
+ALTER TABLE hoa_don ADD COLUMN ngay_tao datetime;
+ALTER TABLE hoa_don ADD COLUMN ngay_sua datetime;
+-- 28/06
+ALTER TABLE hoa_don_chi_tiet ADD COLUMN tho_chinh_ten VARCHAR(100);
+ALTER TABLE hoa_don_chi_tiet ADD COLUMN tho_phu_ten VARCHAR(100);
+ALTER TABLE hoa_don_chi_tiet ADD COLUMN ma_san_pham VARCHAR(10);
+
+
 
 
 
