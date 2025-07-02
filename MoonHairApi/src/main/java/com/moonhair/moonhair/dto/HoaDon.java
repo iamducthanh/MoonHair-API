@@ -27,4 +27,9 @@ public class HoaDon {
     private String nguoiTao;
     private Integer tongSoLuong;
     private List<HoaDonChiTiet> hoaDonChiTiets;
+
+
+    private BigDecimal tongDoanhThu;
+    private BigDecimal tongTienMat;
+    private BigDecimal tongChuyenKhoan;
 }

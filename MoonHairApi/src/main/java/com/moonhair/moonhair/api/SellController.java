@@ -1,9 +1,9 @@
 package com.moonhair.moonhair.api;
 
-import com.moonhair.moonhair.dto.GetSellListDto;
-import com.moonhair.moonhair.dto.ProductList;
-import com.moonhair.moonhair.dto.Sell;
+import com.moonhair.moonhair.dto.*;
+import com.moonhair.moonhair.entities.HoaDonEntity;
 import com.moonhair.moonhair.entities.ProductEntity;
+import com.moonhair.moonhair.repositories.HoaDonRepository;
 import com.moonhair.moonhair.service.ISellService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +14,11 @@ import java.util.List;
 @RequestMapping("/api/sell")
 public class SellController {
     private final ISellService sellService;
+    private final HoaDonRepository hoaDonRepository;
 
-    public SellController(ISellService sellService) {
+    public SellController(ISellService sellService, HoaDonRepository hoaDonRepository) {
         this.sellService = sellService;
+        this.hoaDonRepository = hoaDonRepository;
     }
 
     @GetMapping("product-list")
@@ -36,8 +38,20 @@ public class SellController {
     }
 
     @PostMapping("get-sell-list")
-    public ResponseEntity<?> getSellList(@RequestBody GetSellListDto sell) {
+    public ResponseEntity<?> getSellList(@RequestBody SellFilterRequest sell) {
         return ResponseEntity.ok(sellService.getSellList(sell));
+    }
+
+    @PutMapping("/{id}/update")
+    public ResponseEntity<?> updateInvoice(@PathVariable String id, @RequestBody UpdateInvoice request) {
+        sellService.updateInvoice(id, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/hoa-don/{maHoaDon}")
+    public ResponseEntity<?> getByMa(@PathVariable String maHoaDon) {
+        HoaDon hoaDon = sellService.getByMa(maHoaDon);
+        return ResponseEntity.ok(hoaDon);
     }
 
 }

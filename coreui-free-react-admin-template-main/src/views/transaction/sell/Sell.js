@@ -9,6 +9,7 @@ import sellApi from '../../../api/sellApi';
 import { useAppContext } from '../../../context/AppContext';
 import employeeApi from '../../../api/employeeApi';
 import { toast } from 'react-toastify';
+import { useSearchParams } from 'react-router-dom';
 
 export default function BanHangScreen() {
   const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
@@ -24,11 +25,18 @@ export default function BanHangScreen() {
   const tongTienSauGiamGia = Math.max(tongTien - giamGia, 0);
   const [employees, setEmployees] = useState([]);
 
+  const [searchParams] = useSearchParams();
+const maHoaDon = searchParams.get('maHoaDon');
+
   useEffect(() => {
     // Gọi API lấy danh sách phiếu nhập hàng
     fetchProduct();
     fetchEmployee();
-  }, [selectedBranchLocal]);
+
+    if (maHoaDon) {
+      fetchInvoiceByMa(maHoaDon);
+    }
+  }, [selectedBranchLocal, maHoaDon]);
 
   const fetchProduct = async () => {
     const products = await sellApi.getAllProductSell(selectedBranchLocal)
@@ -36,6 +44,31 @@ export default function BanHangScreen() {
     const services = await sellApi.getAllServiceSell(selectedBranchLocal)
     setDanhSachDichVu(services.data)
     console.log(services.data)
+  };
+
+  const fetchInvoiceByMa = async (ma) => {
+    try {
+      const res = await sellApi.getInvoiceByMa(ma); // 👉 API trả về chi tiết hóa đơn
+      const data = res.data;
+  
+      const list = data.hoaDonChiTiets.map((item) => ({
+        ...item,
+        soLuong: item.soLuong,
+        donGia: parseFloat(item.donGia),
+        name: item.tenHang,
+        kyc: false,
+        thoChinh: '',
+        thoPhu: ''
+      }));
+  
+      setDichVuDaChon(list);
+      setTenKhachHang(data.tenKhachHang);
+      setGiamGia(parseFloat(data.giamGia));
+      setPhuongThucThanhToan("tienmat");
+    } catch (error) {
+      console.log(error)
+      toast.error("Không lấy được thông tin hóa đơn gốc");
+    }
   };
 
   const fetchEmployee = async () => {
@@ -135,8 +168,11 @@ export default function BanHangScreen() {
       toast.success("Thành công!");
       resetForm();
       fetchProduct();
+
+      console.log(sell);
     } catch (error) {
-      toast.error('Có lỗi xảy ra khi lưu!');
+      console.log(error);
+      toast.error(error.response.data.message);
     }
 
 
@@ -251,7 +287,7 @@ export default function BanHangScreen() {
                       onChange={(e) => handleChangeNhanVien(idx, 'thoChinh', e.target.value)}
                     >
                       <option value="">Thợ chính</option>
-                      {employees.filter((nv) => nv.type === 'CHINH')
+                      {employees.filter((nv) => nv.type !== '')
                         .map((nv) => (
                           <option key={nv.id} value={nv.id}>
                             {nv.name}
@@ -264,7 +300,7 @@ export default function BanHangScreen() {
                       onChange={(e) => handleChangeNhanVien(idx, 'thoPhu', e.target.value)}
                     >
                       <option value="">Thợ phụ</option>
-                      {employees.filter((nv) => nv.type === 'PHU')
+                      {employees.filter((nv) => nv.type !== '')
                         .map((nv) => (
                           <option key={nv.id} value={nv.id}>
                             {nv.name}
@@ -313,11 +349,12 @@ export default function BanHangScreen() {
               <CCol md={12}>
                 <div className="text-end mt-3">
                   <div className="mb-2 d-inline-block">
-                    <strong>Giảm giá: </strong>
+                    <strong>Giảm giá (%): </strong>
                     <CFormInput
                       style={{ width: '250px', height: '40px', display: 'inline-block' }}
                       size="sm"
                       type="number"
+                      max="100" min="0"
                       value={giamGia}
                       onChange={(e) => setGiamGia(parseFloat(e.target.value) || '')}
                       placeholder="Nhập giảm giá"

@@ -19,6 +19,7 @@ import {
 import productApi from '../../api/productApi';
 import { useAppContext } from '../../context/AppContext';
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const ProductSetting = () => {
     const [expandedProductId, setExpandedProductId] = useState(null)

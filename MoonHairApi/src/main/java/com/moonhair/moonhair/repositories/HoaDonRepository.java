@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface HoaDonRepository extends JpaRepository<HoaDonEntity, Long> {
+public interface HoaDonRepository extends JpaRepository<HoaDonEntity, Long>, HoaDonRepositoryCustom {
     @Query("""
         SELECT hd FROM HoaDonEntity hd
         WHERE hd.ngayTao BETWEEN :from AND :to
@@ -20,4 +21,6 @@ public interface HoaDonRepository extends JpaRepository<HoaDonEntity, Long> {
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to
     );
+    Optional<HoaDonEntity> findByMaHoaDon(String maHoaDon);
+
 }

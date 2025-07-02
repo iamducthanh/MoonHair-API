@@ -18,6 +18,12 @@ const sellApi = {
     },
     getSellList(param) {
         return axiosClient.post(`/api/sell/get-sell-list`, param);
+    },
+    updateInvoice(maHoaDon, invoiceUpdate) {
+        return axiosClient.put(`/api/sell/${maHoaDon}/update`, invoiceUpdate);
+    },
+    getInvoiceByMa(maHoaDon) {
+        return axiosClient.get(`/api/sell/hoa-don/${maHoaDon}`);
     }
 };
 

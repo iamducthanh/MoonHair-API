@@ -1,5 +1,6 @@
 package com.moonhair.moonhair.service.impl;
 
+import com.moonhair.moonhair.config.MoonHairException;
 import com.moonhair.moonhair.constant.PaymentStatus;
 import com.moonhair.moonhair.dto.*;
 import com.moonhair.moonhair.entities.*;
@@ -9,16 +10,19 @@ import com.moonhair.moonhair.utils.CodeGenerator;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
+@Transactional
 public class SellServiceImpl implements ISellService {
     private final ProductRepository productRepository;
     private final HoaDonRepository hoaDonRepository;
@@ -89,12 +93,12 @@ public class SellServiceImpl implements ISellService {
                     .loai(o.getProductType())
                     .maSanPham(o.getProductCode())
                     .build();
-            if (o.getThoChinh() != null) {
+            if (o.getThoChinh() != null && !o.getThoChinh().isBlank()) {
                 employeeRepository.findById(Integer.valueOf(o.getThoChinh())).ifPresent(tho -> {
                     hoaDonChiTietEntity.setThoChinhTen(tho.getName());
                 });
             }
-            if (o.getThoPhu() != null) {
+            if (o.getThoPhu() != null && !o.getThoPhu().isBlank()) {
                 employeeRepository.findById(Integer.valueOf(o.getThoPhu())).ifPresent(tho -> {
                     hoaDonChiTietEntity.setThoPhuTen(tho.getName());
                 });
@@ -103,7 +107,11 @@ public class SellServiceImpl implements ISellService {
             if (o.getLotId() != null && o.getProductType().equals("SAN_PHAM")) {
                 LotEntity lot = lotRepository.findById(o.getLotId())
                         .filter(oo -> oo.getQuantityRemaining() != null && oo.getQuantityRemaining() > 0)
-                        .orElseThrow(() -> new RuntimeException("Sản phẩm này đã hết hàng!"));
+                        .orElseThrow(() -> new MoonHairException("Sản phẩm này đã hết hàng!"));
+
+                if (o.getSoLuong() > lot.getQuantityRemaining()) {
+                    throw new MoonHairException("Số lượng sản phẩm vượt quá sản phẩm tồn!");
+                }
                 lot.setQuantityRemaining(lot.getQuantityRemaining() - o.getSoLuong());
                 lotList.add(lot);
             }
@@ -116,21 +124,40 @@ public class SellServiceImpl implements ISellService {
     }
 
     @Override
-    public List<HoaDon> getSellList(GetSellListDto getSellListDto) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    public List<HoaDon> getSellList(SellFilterRequest dto) {
+        List<HoaDonEntity> entities = hoaDonRepository.findByFilter(dto);
+        return hoaDonEntityToDto(entities);
+    }
 
-        List<HoaDonEntity> hoaDonList = new ArrayList<>();
-        if (getSellListDto.getGetDate() != null) {
-            LocalDate date = LocalDate.parse(getSellListDto.getGetDate(), formatter);
-            hoaDonList = hoaDonRepository.findByNgayTaoBetween(date.atStartOfDay(), date.atTime(LocalTime.MAX));
+    @Override
+    public HoaDon getByMa(String maHoaDon) {
+        HoaDonEntity hoaDon = hoaDonRepository.findByMaHoaDon(maHoaDon)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy"));
+        List<HoaDon> hoaDons = hoaDonEntityToDto(Arrays.asList(hoaDon));
+        return hoaDons.get(0);
+    }
+
+    @Override
+    public void updateInvoice(String maHoaDon, UpdateInvoice invoiceUpdate) {
+        HoaDonEntity hoaDon = hoaDonRepository.findByMaHoaDon(maHoaDon)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn: " + maHoaDon));
+
+        if (invoiceUpdate.getTrangThai() != null && !invoiceUpdate.getTrangThai().isBlank()) {
+            hoaDon.setTrangThaiThanhToan(invoiceUpdate.getTrangThai());
+            hoaDon.setGhiChuThanhToan(invoiceUpdate.getTrangThai().equals("100") ? "Thành công" : "Chờ chuyển khoản");
         }
-        List<HoaDon> hoaDons = hoaDonEntityToDto(hoaDonList);
-
-        return hoaDons;
+        if (invoiceUpdate.getIsDelete() != null && invoiceUpdate.getIsDelete()) {
+            hoaDon.setIsDelete(true);
+        }
+        hoaDonRepository.save(hoaDon);
     }
 
     public List<HoaDon> hoaDonEntityToDto (List<HoaDonEntity> hoaDonList) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        AtomicReference<BigDecimal> tongDoanhThu = new AtomicReference<>(BigDecimal.ZERO);
+        AtomicReference<BigDecimal> tongTienMat = new AtomicReference<>(BigDecimal.ZERO);
+        AtomicReference<BigDecimal> tongChuyenKhoan = new AtomicReference<>(BigDecimal.ZERO);
 
         List<HoaDon> hoaDons = new ArrayList<>();
         hoaDonList.forEach(o -> {
@@ -147,6 +174,12 @@ public class SellServiceImpl implements ISellService {
                     .nguoiTao(o.getNguoiTaoDon())
                     .phuongThuc(o.getPhuongThuc().equals("tienmat") ? "Tiền mặt": "Chuyển khoản")
                     .build();
+            if (o.getPhuongThuc().equals("tienmat")) {
+                tongTienMat.set(tongTienMat.get().add(o.getTongTienThanhToan()));
+            } else {
+                tongChuyenKhoan.set(tongChuyenKhoan.get().add(o.getTongTienThanhToan()));
+            }
+            tongDoanhThu.set(tongDoanhThu.get().add(o.getTongTienThanhToan()));
             List<HoaDonChiTiet> hoaDonChiTiet = new ArrayList<>();
             o.getHoaDonChiTietList().forEach(hoaDonChiTietEntity -> {
                 HoaDonChiTiet hoaDonChiTietDto = HoaDonChiTiet.builder()
@@ -157,6 +190,7 @@ public class SellServiceImpl implements ISellService {
                         .thanhTien(hoaDonChiTietEntity.getThanhTien())
                         .thoChinh(hoaDonChiTietEntity.getThoChinhTen())
                         .thoPhu(hoaDonChiTietEntity.getThoPhuTen())
+                        .idHoaDonChiTiet(hoaDonChiTietEntity.getId())
                         .build();
                 hoaDonChiTiet.add(hoaDonChiTietDto);
             });
@@ -164,6 +198,13 @@ public class SellServiceImpl implements ISellService {
             hoaDons.add(hoaDon);
         });
 
+        if (!hoaDons.isEmpty()) {
+            hoaDons.add(HoaDon.builder()
+                    .tongDoanhThu(tongDoanhThu.get())
+                    .tongTienMat(tongTienMat.get())
+                    .tongChuyenKhoan(tongChuyenKhoan.get())
+                    .build());
+        }
         return hoaDons;
     }
 }

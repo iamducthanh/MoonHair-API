@@ -112,6 +112,9 @@ ALTER TABLE hoa_don ADD COLUMN ngay_sua datetime;
 ALTER TABLE hoa_don_chi_tiet ADD COLUMN tho_chinh_ten VARCHAR(100);
 ALTER TABLE hoa_don_chi_tiet ADD COLUMN tho_phu_ten VARCHAR(100);
 ALTER TABLE hoa_don_chi_tiet ADD COLUMN ma_san_pham VARCHAR(10);
+ALTER TABLE hoa_don ADD COLUMN is_delete bit;
+
+SELECT h FROM HoaDonEntity h WHERE 1=1 AND DATE(h.ngayTao) BETWEEN :fromDate AND :toDate
 
 
 

@@ -19,4 +19,5 @@ public class HoaDonChiTiet {
     private BigDecimal thanhTien;
     private String thoChinh;
     private String thoPhu;
+    private Long idHoaDonChiTiet;
 }

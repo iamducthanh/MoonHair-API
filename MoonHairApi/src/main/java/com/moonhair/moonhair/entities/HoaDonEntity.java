@@ -54,6 +54,8 @@ public class HoaDonEntity {
     @LastModifiedDate
     private LocalDateTime ngaySua;
 
+    private Boolean isDelete;
+
     @OneToMany(mappedBy = "hoaDon", fetch = FetchType.LAZY)
     private List<HoaDonChiTietEntity> hoaDonChiTietList;
 }
