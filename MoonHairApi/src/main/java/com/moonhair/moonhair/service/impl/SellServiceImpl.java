@@ -93,8 +93,10 @@ public class SellServiceImpl implements ISellService {
                     .loai(o.getProductType())
                     .maSanPham(o.getProductCode())
                     .build();
+            EmployeeEntity emChinh = null;
             if (o.getThoChinh() != null && !o.getThoChinh().isBlank()) {
                 employeeRepository.findById(Integer.valueOf(o.getThoChinh())).ifPresent(tho -> {
+                    emChinh = tho;
                     hoaDonChiTietEntity.setThoChinhTen(tho.getName());
                 });
             }
@@ -103,6 +105,14 @@ public class SellServiceImpl implements ISellService {
                     hoaDonChiTietEntity.setThoPhuTen(tho.getName());
                 });
             }
+            if (o.getProductType() == null) {
+                Integer hoaHongChinh = 0;
+                if (o.getThoPhu() == null || o.getThoPhu().isBlank()) {
+
+                }
+            }
+
+
             hoaDonChiTiets.add(hoaDonChiTietEntity);
             if (o.getLotId() != null && o.getProductType().equals("SAN_PHAM")) {
                 LotEntity lot = lotRepository.findById(o.getLotId())

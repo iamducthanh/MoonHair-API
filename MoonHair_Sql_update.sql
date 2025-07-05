@@ -116,6 +116,13 @@ ALTER TABLE hoa_don ADD COLUMN is_delete bit;
 
 SELECT h FROM HoaDonEntity h WHERE 1=1 AND DATE(h.ngayTao) BETWEEN :fromDate AND :toDate
 
+-- 05/07
+ALTER TABLE chi_nhanh ADD COLUMN hoa_hong_chinh int;
+ALTER TABLE chi_nhanh ADD COLUMN hoa_hong_phu int;
+ALTER TABLE hoa_don_chi_tiet ADD COLUMN hoa_hong_chinh int;
+ALTER TABLE hoa_don_chi_tiet ADD COLUMN hoa_hong_phu int;
+
+
 
 
 

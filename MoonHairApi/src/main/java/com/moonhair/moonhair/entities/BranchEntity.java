@@ -19,4 +19,10 @@ public class BranchEntity {
     @Column(name = "dia_chi")
     private String address;
     private Boolean active;
+
+    @Column(name = "hoa_hong_chinh")
+    private Integer hoaHongChinh;
+
+    @Column(name = "hoa_hong_phu")
+    private Integer hoaHongPhu;
 }

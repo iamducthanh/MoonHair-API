@@ -1,5 +1,6 @@
 package com.moonhair.moonhair.api;
 
+import com.moonhair.moonhair.dto.BangLuongDTO;
 import com.moonhair.moonhair.entities.EmployeeEntity;
 import com.moonhair.moonhair.service.IEmployeeService;
 import org.springframework.http.ResponseEntity;
@@ -41,4 +42,14 @@ public class EmployeeController {
         employeeService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/luong")
+    public ResponseEntity<?> getBangLuong(
+            @RequestParam int thang,
+            @RequestParam int nam,
+            @RequestParam int idChiNhanh) {
+        List<BangLuongDTO> list = employeeService.getBangLuong(thang, nam, idChiNhanh);
+        return ResponseEntity.ok(list);
+    }
+
 }

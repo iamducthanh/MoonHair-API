@@ -57,7 +57,11 @@ public class HoaDonChiTietEntity {
     @Column(name = "ma_san_pham")
     private String maSanPham;
 
+    @Column(name = "hoa_hong_chinh")
+    private Integer hoaHongChinh;
 
+    @Column(name = "hoa_hong_phu")
+    private Integer hoaHongPhu;
     // Getters & Setters
 }
 
