@@ -22,7 +22,7 @@ export default function BanHangScreen() {
   const [phuongThucThanhToan, setPhuongThucThanhToan] = useState('tienmat'); // 'tienmat' hoặc 'chuyenkhoan'
   const [dichVuDaChon, setDichVuDaChon] = useState([])
   const tongTien = dichVuDaChon.reduce((sum, sp) => sum + sp.soLuong * sp.donGia, 0)
-  const tongTienSauGiamGia = Math.max(tongTien - giamGia, 0);
+  const tongTienSauGiamGia = Math.max(tongTien - tongTien/100*giamGia, 0);
   const [employees, setEmployees] = useState([]);
 
   const [searchParams] = useSearchParams();
@@ -152,7 +152,7 @@ const maHoaDon = searchParams.get('maHoaDon');
     obj.tongTien = tongTien;
     obj.tongTienThanhToan = tongTienSauGiamGia;
     obj.idChiNhanh = selectedBranchLocal
-    obj.giamGia = giamGia;
+    obj.giamGia = tongTien/100*giamGia;
     obj.tenKhachHang = tenKhachHang;
     console.log(obj)
 

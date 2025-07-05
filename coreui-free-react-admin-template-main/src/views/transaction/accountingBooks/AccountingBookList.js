@@ -355,7 +355,7 @@ const AccountingBookList = () => {
                                           <div>
                                             <CFormSelect
                                               size="sm"
-                                              value={editStates[item.idHoaDonChiTiet].thoChinh ? editStates[item.idHoaDonChiTiet].thoChinh : 'Th' }
+                                              value={editStates[item.idHoaDonChiTiet] }
                                               onChange={(e) => {
                                                 setEditStates((prev) => ({
                                                   ...prev,
