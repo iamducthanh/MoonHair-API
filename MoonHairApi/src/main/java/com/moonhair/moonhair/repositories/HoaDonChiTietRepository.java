@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTietEntity, Long> {
-    @Query("SELECT h FROM HoaDonChiTietEntity h WHERE MONTH(h.hoaDon.ngayTao) = :thang AND YEAR(h.hoaDon.ngayTao) = :nam AND " +
-            "(LOWER(h.thoChinh) = LOWER(:ten) OR LOWER(h.thoPhu) = LOWER(:ten))")
-    List<HoaDonChiTietEntity> findByThangAndNhanVien(@Param("thang") int thang, @Param("nam") int nam, @Param("ten") String ten);
+    @Query("SELECT h FROM HoaDonChiTietEntity h WHERE (h.hoaDon.isDelete is null or h.hoaDon.isDelete = false) AND MONTH(h.hoaDon.ngayTao) = :thang AND YEAR(h.hoaDon.ngayTao) = :nam AND " +
+            "(LOWER(h.thoChinh) = LOWER(:maTho) OR LOWER(h.thoPhu) = LOWER(:maTho))")
+    List<HoaDonChiTietEntity> findByThangAndNhanVien(@Param("thang") int thang, @Param("nam") int nam, @Param("maTho") String maTho);
 
 }

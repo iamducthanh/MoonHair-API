@@ -36,6 +36,7 @@
     "dayjs": "^1.11.13",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
+    "pdfmake": "^0.2.20",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-confirm-alert": "^3.0.6",

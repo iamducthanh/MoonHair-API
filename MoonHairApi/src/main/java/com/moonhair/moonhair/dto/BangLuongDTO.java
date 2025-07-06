@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class BangLuongDTO {
     private String tenNhanVien;
+    private String maNhanVien;
     private String loaiNhanVien; // Thợ chính, phụ, ...
     private BigDecimal luongCoBan;
     private BigDecimal doanhThu;

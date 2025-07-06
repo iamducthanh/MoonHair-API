@@ -17,16 +17,13 @@ import {
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
-  // {
-  //   component: CNavItem,
-  //   name: 'Dashboard',
-  //   to: '/dashboard',
-  //   icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-  //   badge: {
-  //     color: 'info',
-  //     text: 'NEW',
-  //   },
-  // },
+  {
+    component: CNavItem,
+    name: 'Trang chủ',
+    to: '/dashboard',
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+
+  },
   // {
   //   component: CNavTitle,
   //   name: 'Theme',
@@ -43,15 +40,15 @@ const _nav = [
   //   to: '/theme/typography',
   //   icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
   // },
-  {
-    component: CNavTitle,
-    name: 'Components',
-  },
+  // {
+  //   component: CNavTitle,
+  //   name: 'Components',
+  // },
   {
     component: CNavGroup,
     name: 'Quản trị hệ thống',
     to: '/system',
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -69,7 +66,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Sản phẩm',
     to: '/product',
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -87,7 +84,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Giao dịch',
     to: '/transaction',
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -98,7 +95,15 @@ const _nav = [
         component: CNavItem,
         name: 'Bán hàng',
         to: '/transaction/sell',
-      },
+      }
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Báo cáo',
+    to: '/transaction',
+    icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+    items: [
       {
         component: CNavItem,
         name: 'Sổ',

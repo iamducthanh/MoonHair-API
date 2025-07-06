@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
@@ -94,21 +95,47 @@ public class SellServiceImpl implements ISellService {
                     .maSanPham(o.getProductCode())
                     .build();
             EmployeeEntity emChinh = null;
+            EmployeeEntity emPhu = null;
             if (o.getThoChinh() != null && !o.getThoChinh().isBlank()) {
-                employeeRepository.findById(Integer.valueOf(o.getThoChinh())).ifPresent(tho -> {
-                    emChinh = tho;
-                    hoaDonChiTietEntity.setThoChinhTen(tho.getName());
-                });
+                Optional<EmployeeEntity> optionalTho = employeeRepository.findById(Integer.valueOf(o.getThoChinh()));
+                if (optionalTho.isPresent()) {
+                    emChinh = optionalTho.get();
+                    hoaDonChiTietEntity.setThoChinhTen(emChinh.getName());
+                }
             }
             if (o.getThoPhu() != null && !o.getThoPhu().isBlank()) {
-                employeeRepository.findById(Integer.valueOf(o.getThoPhu())).ifPresent(tho -> {
-                    hoaDonChiTietEntity.setThoPhuTen(tho.getName());
-                });
+                Optional<EmployeeEntity> optionalTho = employeeRepository.findById(Integer.valueOf(o.getThoPhu()));
+                if (optionalTho.isPresent()) {
+                    emPhu = optionalTho.get();
+                    hoaDonChiTietEntity.setThoPhuTen(emPhu.getName());
+                }
             }
             if (o.getProductType() == null) {
-                Integer hoaHongChinh = 0;
-                if (o.getThoPhu() == null || o.getThoPhu().isBlank()) {
-
+                if (emPhu == null && emChinh != null) {
+                    hoaDonChiTietEntity.setHoaHongChinh(Integer.parseInt(emChinh.getSalaryRate()) + branchEntity.getHoaHongPhu());
+                    hoaDonChiTietEntity.setHoaHongPhu(0);
+                } else if (emPhu != null && emChinh == null) {
+                    hoaDonChiTietEntity.setHoaHongPhu(Integer.parseInt(emPhu.getSalaryRate()) + branchEntity.getHoaHongChinh());
+                    hoaDonChiTietEntity.setHoaHongChinh(0);
+                } else if (emChinh != null) {
+                    hoaDonChiTietEntity.setHoaHongPhu(Integer.parseInt(emPhu.getSalaryRate()));
+                    hoaDonChiTietEntity.setHoaHongChinh(Integer.parseInt(emChinh.getSalaryRate()));
+                }
+            } else if (o.getProductType().equals("SAN_PHAM")) {
+                if (emChinh != null) {
+                    hoaDonChiTietEntity.setHoaHongPhu(0);
+                    hoaDonChiTietEntity.setHoaHongChinh(Integer.parseInt(emChinh.getSalaryRate()));
+                } else if (emPhu != null) {
+                    hoaDonChiTietEntity.setHoaHongPhu(branchEntity.getHoaHongChinh());
+                    hoaDonChiTietEntity.setHoaHongChinh(0);
+                }
+            } else if (o.getProductType().equals("DICH_VU")) {
+                if (emChinh != null) {
+                    hoaDonChiTietEntity.setHoaHongPhu(0);
+                    hoaDonChiTietEntity.setHoaHongChinh(branchEntity.getHoaHongChinh());
+                } else if (emPhu != null) {
+                    hoaDonChiTietEntity.setHoaHongPhu(branchEntity.getHoaHongChinh());
+                    hoaDonChiTietEntity.setHoaHongChinh(0);
                 }
             }
 

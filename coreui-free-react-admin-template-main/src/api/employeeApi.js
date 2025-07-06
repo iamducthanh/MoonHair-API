@@ -15,6 +15,9 @@ const employeeApi = {
     },
     deleteEmployee(id) {
         return axiosClient.delete(`/api/employees/${id}`, { active: false });
+    },
+    getAllSalary(thang, nam, idChiNhanh) {
+        return axiosClient.get(`/api/employees/luong?thang=${thang}&nam=${nam}&idChiNhanh=${idChiNhanh}`);
     }
 };
 

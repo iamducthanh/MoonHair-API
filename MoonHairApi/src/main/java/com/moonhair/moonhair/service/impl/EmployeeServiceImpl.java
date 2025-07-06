@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements IEmployeeService {
@@ -73,6 +75,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public List<BangLuongDTO> getBangLuong(int thang, int nam, int idChiNhanh) {
         List<EmployeeEntity> nhanViens = employeeRepository.findAllByBranchId(idChiNhanh);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         List<BangLuongDTO> result = new ArrayList<>();
 
@@ -81,39 +84,34 @@ public class EmployeeServiceImpl implements IEmployeeService {
             BigDecimal hoaHong = BigDecimal.ZERO;
             List<HoaDonThamGiaDTO> hdThamGias = new ArrayList<>();
 
-            List<HoaDonChiTietEntity> ctList = hoaDonChiTietRepository.findByThangAndNhanVien(thang, nam, nv.getName());
+            List<HoaDonChiTietEntity> ctList = hoaDonChiTietRepository.findByThangAndNhanVien(thang, nam, String.valueOf(nv.getId()));
             for (HoaDonChiTietEntity ct : ctList) {
                 HoaDonEntity hoaDon = ct.getHoaDon();
+
                 LocalDateTime ngayTao = hoaDon.getNgayTao();
                 if (hoaDon.getIdChiNhanh() != idChiNhanh) continue;
 
-                String vaiTro;
-                int tile;
-
-                if (ct.getThoChinh() != null && ct.getThoChinh().equalsIgnoreCase(nv.getName())) {
-                    vaiTro = "Thợ chính";
-                    tile = 10;
-                } else if (ct.getThoPhu() != null && ct.getThoPhu().equalsIgnoreCase(nv.getName())) {
-                    vaiTro = "Thợ phụ";
-                    tile = 5;
-                } else continue;
-
-                BigDecimal hoaHongCt = ct.getThanhTien().multiply(BigDecimal.valueOf(tile)).divide(BigDecimal.valueOf(100));
-
                 HoaDonThamGiaDTO dto = new HoaDonThamGiaDTO();
                 dto.setMaHoaDon(hoaDon.getMaHoaDon());
-                dto.setNgay(hoaDon.getNgayTao().toLocalDate());
-                dto.setVaiTro(vaiTro);
+                dto.setTenKhach(ct.getTenKhachSanPham().isEmpty() ? hoaDon.getTenKhach() : ct.getTenKhachSanPham());
+                dto.setNgay(hoaDon.getNgayTao().toLocalDate().format(formatter));
+                if (ct.getThoChinh() != null && ct.getThoChinh().equals(String.valueOf(nv.getId()))) {
+                    dto.setVaiTro("Thợ chính");
+                    dto.setPhanTram(ct.getHoaHongChinh());
+                } else if (ct.getThoPhu() != null && ct.getThoPhu().equals(String.valueOf(nv.getId()))) {
+                    dto.setVaiTro("Thợ phụ");
+                    dto.setPhanTram(ct.getHoaHongPhu());
+                }
                 dto.setTongTien(ct.getThanhTien());
-                dto.setPhanTram(tile);
+                BigDecimal hoaHongCt = ct.getThanhTien().multiply(BigDecimal.valueOf(dto.getPhanTram())).divide(BigDecimal.valueOf(100));
                 dto.setHoaHong(hoaHongCt);
-
                 doanhThu = doanhThu.add(ct.getThanhTien());
                 hoaHong = hoaHong.add(hoaHongCt);
                 hdThamGias.add(dto);
             }
 
             BangLuongDTO bl = new BangLuongDTO();
+            bl.setMaNhanVien(nv.getId().toString());
             bl.setTenNhanVien(nv.getName());
             bl.setLoaiNhanVien(nv.getType());
             bl.setLuongCoBan(BigDecimal.valueOf(0));
@@ -124,6 +122,10 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
             result.add(bl);
         }
+        result = result.stream()
+                .filter(n -> !n.getHoaDons().isEmpty())
+                .collect(Collectors.toList());
+
 
         return result;
     }

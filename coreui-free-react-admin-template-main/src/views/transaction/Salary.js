@@ -19,7 +19,9 @@ import {
 } from "@coreui/react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-
+import employeeApi from '../../api/employeeApi';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 const fakeData = [
   {
     id: 1,
@@ -42,32 +44,76 @@ const fakeData = [
   },
 ];
 
-const formatCurrency = (num) => num.toLocaleString("vi-VN") + "₫";
+const formatCurrency = (num) => num.toLocaleString("vi-VN") + " ₫";
 
 const LuongNhanVien = () => {
   const [data, setData] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [year, setYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
-    setData(fakeData); // Thay bằng gọi API thật sau này
+    fetchSalary()
   }, []);
 
+  const fetchSalary = async () => {
+    try {
+      const response = await employeeApi.getAllSalary('7', '2025', 1);
+      setData(response.data);
+    } catch (error) {
+      toast.error('Lỗi khi tải danh sách lương nhân viên!');
+    }
+  };
+
   const exportPDF = () => {
-    const doc = new jsPDF();
-    doc.text("BẢNG LƯƠNG NHÂN VIÊN - 07/2025", 14, 20);
-    autoTable(doc, {
-      startY: 30,
-      head: [["Tên", "Loại", "Lương cơ bản", "Doanh thu", "Hoa hồng", "Tổng lương"]],
-      body: data.map((nv) => [
-        nv.ten,
-        nv.loai,
-        formatCurrency(nv.luongCoBan),
-        formatCurrency(nv.doanhThu),
-        formatCurrency(nv.hoaHong),
-        formatCurrency(nv.tongLuong),
-      ]),
+    const content = [];
+
+    data.forEach((nv) => {
+      content.push(
+        { text: `Nhân viên: ${nv.tenNhanVien}`, bold: true, margin: [0, 10, 0, 2] },
+        { text: `Tổng doanh thu: ${nv.doanhThu?.toLocaleString()} đ` },
+        { text: `Tổng lương: ${nv.tongLuong?.toLocaleString()} đ` },
+      );
+
+      if (nv.hoaDons?.length > 0) {
+        content.push({
+          style: "tableExample",
+          table: {
+            headerRows: 1,
+            widths: ["*", "*", "*", "*", "*", "*"],
+            body: [
+              ["Mã HĐ", "Ngày", "Khách", "Vai trò", "Tổng tiền", "Hoa hồng"],
+              ...nv.hoaDons.map((hd) => [
+                hd.maHoaDon,
+                hd.ngay,
+                hd.tenKhach,
+                hd.vaiTro,
+                `${hd.tongTien?.toLocaleString()} đ`,
+                `${hd.hoaHong?.toLocaleString()} đ`,
+              ]),
+            ],
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 5, 0, 10],
+        });
+      }
     });
-    doc.save("bang-luong.pdf");
+
+    const docDefinition = {
+      content: [
+        { text: "BẢNG LƯƠNG NHÂN VIÊN", style: "header", alignment: "center" },
+        ...content,
+      ],
+      styles: {
+        header: { fontSize: 16, bold: true },
+        tableExample: { margin: [0, 5, 0, 15] },
+      },
+      defaultStyle: {
+        font: "Roboto",
+      },
+    };
+
+    pdfMake.createPdf(docDefinition).download("bang-luong.pdf");
   };
 
   return (
@@ -81,14 +127,8 @@ const LuongNhanVien = () => {
                 <option value="7">07/2025</option>
               </CFormSelect>
             </CCol>
-            <CCol md={3}>
-              <CFormLabel>Chi nhánh</CFormLabel>
-              <CFormSelect>
-                <option>MoonHair Hà Nội</option>
-              </CFormSelect>
-            </CCol>
-            <CCol md={3} className="d-flex align-items-end">
-              <CButton color="primary">Lọc</CButton>
+
+            <CCol md={6}>
             </CCol>
             <CCol md={3} className="d-flex align-items-end justify-content-end">
               <CButton color="success" onClick={exportPDF}>Xuất PDF</CButton>
@@ -101,8 +141,6 @@ const LuongNhanVien = () => {
             <CTableRow>
               <CTableHeaderCell>#</CTableHeaderCell>
               <CTableHeaderCell>Tên</CTableHeaderCell>
-              <CTableHeaderCell>Loại</CTableHeaderCell>
-              <CTableHeaderCell>Lương cơ bản</CTableHeaderCell>
               <CTableHeaderCell>Doanh thu</CTableHeaderCell>
               <CTableHeaderCell>Hoa hồng</CTableHeaderCell>
               <CTableHeaderCell>Tổng lương</CTableHeaderCell>
@@ -111,19 +149,17 @@ const LuongNhanVien = () => {
           </CTableHead>
           <CTableBody>
             {data.map((nv, idx) => (
-              <React.Fragment key={nv.id}>
+              <React.Fragment key={nv.maNhanVien}>
                 <CTableRow>
                   <CTableDataCell>{idx + 1}</CTableDataCell>
-                  <CTableDataCell>{nv.ten}</CTableDataCell>
-                  <CTableDataCell>{nv.loai}</CTableDataCell>
-                  <CTableDataCell>{formatCurrency(nv.luongCoBan)}</CTableDataCell>
+                  <CTableDataCell>{nv.tenNhanVien}</CTableDataCell>
                   <CTableDataCell>{formatCurrency(nv.doanhThu)}</CTableDataCell>
-                  <CTableDataCell>{formatCurrency(nv.hoaHong)}</CTableDataCell>
+                  <CTableDataCell>{formatCurrency(nv.tongHoaHong)}</CTableDataCell>
                   <CTableDataCell>{formatCurrency(nv.tongLuong)}</CTableDataCell>
                   <CTableDataCell>
                     <CButton
                       size="sm"
-                      onClick={() => setExpandedRow(expandedRow === nv.id ? null : nv.id)}
+                      onClick={() => setExpandedRow(expandedRow === nv.maNhanVien ? null : nv.maNhanVien)}
                     >
                       {expandedRow === nv.id ? "Ẩn" : "Xem"}
                     </CButton>
@@ -132,12 +168,13 @@ const LuongNhanVien = () => {
 
                 <CTableRow>
                   <CTableDataCell colSpan={8} className="p-0 border-0">
-                    <CCollapse visible={expandedRow === nv.id}>
+                    <CCollapse visible={expandedRow === nv.maNhanVien}>
                       <CTable small bordered className="mb-3">
                         <CTableHead color="light">
                           <CTableRow>
                             <CTableHeaderCell>Mã HĐ</CTableHeaderCell>
                             <CTableHeaderCell>Ngày</CTableHeaderCell>
+                            <CTableHeaderCell>Khách</CTableHeaderCell>
                             <CTableHeaderCell>Vai trò</CTableHeaderCell>
                             <CTableHeaderCell>Tổng tiền</CTableHeaderCell>
                             <CTableHeaderCell>Tỷ lệ</CTableHeaderCell>
@@ -145,14 +182,15 @@ const LuongNhanVien = () => {
                           </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                          {nv.hoaDon.map((hd, idx) => (
+                          {nv.hoaDons.map((hd, idx) => (
                             <CTableRow key={idx}>
                               <CTableDataCell>{hd.maHoaDon}</CTableDataCell>
                               <CTableDataCell>{hd.ngay}</CTableDataCell>
+                              <CTableDataCell>{hd.tenKhach}</CTableDataCell>
                               <CTableDataCell>{hd.vaiTro}</CTableDataCell>
-                              <CTableDataCell>{formatCurrency(hd.tongTien)}</CTableDataCell>
+                              <CTableDataCell>{formatCurrency(hd.tongTien ? hd.tongTien : 0)}</CTableDataCell>
                               <CTableDataCell>{hd.phanTram}%</CTableDataCell>
-                              <CTableDataCell>{formatCurrency(hd.hoaHong)}</CTableDataCell>
+                              <CTableDataCell>{formatCurrency(hd.hoaHong ? hd.hoaHong : 0)}</CTableDataCell>
                             </CTableRow>
                           ))}
                         </CTableBody>
