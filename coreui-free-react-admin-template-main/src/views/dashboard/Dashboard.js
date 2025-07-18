@@ -1,5 +1,5 @@
-import React from 'react'
 import classNames from 'classnames'
+import React, { useState, useEffect, useRef } from "react";
 
 import {
   CAvatar,
@@ -53,8 +53,45 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 import MainChart from './MainChart'
+import dashboardApi from '../../api/dashboard';
 
 const Dashboard = () => {
+  const [data, setData] = useState(null);
+  const widgetChartRef1 = useRef(null)
+  const widgetChartRef2 = useRef(null)
+
+  useEffect(() => {
+    document.documentElement.addEventListener('ColorSchemeChange', () => {
+      if (widgetChartRef1.current) {
+        setTimeout(() => {
+          widgetChartRef1.current.data.datasets[0].pointBackgroundColor = getStyle('--cui-primary')
+          widgetChartRef1.current.update()
+        })
+      }
+
+      if (widgetChartRef2.current) {
+        setTimeout(() => {
+          widgetChartRef2.current.data.datasets[0].pointBackgroundColor = getStyle('--cui-info')
+          widgetChartRef2.current.update()
+        })
+      }
+    })
+  }, [widgetChartRef1, widgetChartRef2])
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const fetchData = async () => {
+    try {
+      const res = await dashboardApi.getDashboard();
+      console.log(dashboardApi.getDashboard())
+      console.log(res.data)
+      setData(res.data);
+    } catch (error) {
+      console.error("Lỗi khi fetch dashboard:", error);
+    }
+  };
+
   const progressExample = [
     { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
     { title: 'Unique', value: '24.093 Users', percent: 20, color: 'info' },
@@ -178,7 +215,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <WidgetsDropdown className="mb-4" />
+      <WidgetsDropdown data={data} className="mb-4" />
       <CCard className="mb-4">
         <CCardBody>
           <CRow>

@@ -18,6 +18,9 @@ const employeeApi = {
     },
     getAllSalary(thang, nam, idChiNhanh) {
         return axiosClient.get(`/api/employees/luong?thang=${thang}&nam=${nam}&idChiNhanh=${idChiNhanh}`);
+    },
+    getAccountInfo() {
+        return axiosClient.get(`/api/employees/me`);
     }
 };
 

@@ -88,13 +88,12 @@ public class EmployeeServiceImpl implements IEmployeeService {
             for (HoaDonChiTietEntity ct : ctList) {
                 HoaDonEntity hoaDon = ct.getHoaDon();
 
-                LocalDateTime ngayTao = hoaDon.getNgayTao();
                 if (hoaDon.getIdChiNhanh() != idChiNhanh) continue;
 
                 HoaDonThamGiaDTO dto = new HoaDonThamGiaDTO();
                 dto.setMaHoaDon(hoaDon.getMaHoaDon());
                 dto.setTenKhach(ct.getTenKhachSanPham().isEmpty() ? hoaDon.getTenKhach() : ct.getTenKhachSanPham());
-                dto.setNgay(hoaDon.getNgayTao().toLocalDate().format(formatter));
+                dto.setNgay(hoaDon.getNgayHoaDon().toLocalDate().format(formatter));
                 if (ct.getThoChinh() != null && ct.getThoChinh().equals(String.valueOf(nv.getId()))) {
                     dto.setVaiTro("Thợ chính");
                     dto.setPhanTram(ct.getHoaHongChinh());
@@ -125,8 +124,6 @@ public class EmployeeServiceImpl implements IEmployeeService {
         result = result.stream()
                 .filter(n -> !n.getHoaDons().isEmpty())
                 .collect(Collectors.toList());
-
-
         return result;
     }
 

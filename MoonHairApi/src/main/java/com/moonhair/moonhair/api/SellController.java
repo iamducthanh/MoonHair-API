@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/sell")
@@ -52,6 +53,11 @@ public class SellController {
     public ResponseEntity<?> getByMa(@PathVariable String maHoaDon) {
         HoaDon hoaDon = sellService.getByMa(maHoaDon);
         return ResponseEntity.ok(hoaDon);
+    }
+
+    @GetMapping("/thang-nam")
+    public List<Map<String, Integer>> getDanhSachThangNam() {
+        return sellService.getDistinctMonthAndYear();
     }
 
 }

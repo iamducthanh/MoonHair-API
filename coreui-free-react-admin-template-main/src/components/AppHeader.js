@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import branchApi from '../api/branchApi';
+import employeeApi from '../api/employeeApi';
 import { CRow, CCol, CFormSelect } from '@coreui/react';
 import {
   CContainer,
@@ -40,6 +41,7 @@ const AppHeader = () => {
   const [branches, setBranches] = useState([]);
   const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
   const { selectedBranchLocalName, setSelectedBranchLocalName } = useAppContext();
+  const { perms, setPerms } = useAppContext([]);
 
   useEffect(() => {
     document.addEventListener('scroll', () => {
@@ -60,7 +62,15 @@ const AppHeader = () => {
       } catch (error) {
       }
     };
+    const fetchPerm = async () => {
+      try {
+        const response = await employeeApi.getAccountInfo();
+        setPerms(response.data.permissions);
+      } catch (error) {
+      }
+    };
     fetchBranches();
+    fetchPerm();
   }, []);
   const handleBranchChange = (e) => {
     const [id, name] = e.target.value.split('%');

@@ -18,6 +18,7 @@ import {
   CFormInput,
 } from "@coreui/react";
 import { jsPDF } from "jspdf";
+import sellApi from '../../api/sellApi';
 import autoTable from "jspdf-autotable";
 import employeeApi from '../../api/employeeApi';
 import pdfMake from "pdfmake/build/pdfmake";
@@ -51,17 +52,43 @@ const LuongNhanVien = () => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
+  const [options, setOptions] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState([]);
+  const [selectedYear, setSelectedYear] = useState([]);
+  const [uniqueYears, setUniqueYears] = useState([]);
+  const [uniqueMonths, setUniqueMonths] = useState([]);
 
   useEffect(() => {
     fetchSalary()
-  }, []);
+    fetchThangNam()
+  }, [month, year]);
 
   const fetchSalary = async () => {
     try {
-      const response = await employeeApi.getAllSalary('7', '2025', 1);
+      const response = await employeeApi.getAllSalary(month, year, 1);
       setData(response.data);
     } catch (error) {
       toast.error('Lỗi khi tải danh sách lương nhân viên!');
+    }
+  };
+
+  const fetchThangNam = async () => {
+    try {
+      const response = await sellApi.getThangNam();
+      const data = response.data;
+
+      const years = [...new Set(data.map(item => item.year))];
+      const months = [...new Set(data.map(item => item.month))];
+
+      setUniqueYears(years);
+      setUniqueMonths(months);
+
+      console.log(years)
+      console.log(months)
+
+    } catch (error) {
+      console.log(error)
+      toast.error('Lỗi khi tải danh sách tháng năm!');
     }
   };
 
@@ -123,12 +150,32 @@ const LuongNhanVien = () => {
           <CRow>
             <CCol md={3}>
               <CFormLabel>Tháng</CFormLabel>
-              <CFormSelect>
-                <option value="7">07/2025</option>
+              <CFormSelect
+                value={month}
+                onChange={(e) => setMonth(Number(e.target.value))}
+              >
+                <option value="">-- Chọn tháng --</option>
+                {uniqueMonths.map((m) => (
+                  <option key={m} value={m}>
+                    {m.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </CFormSelect>
+            </CCol>
+            <CCol md={3}>
+              <CFormLabel>Năm</CFormLabel>
+              <CFormSelect
+                value={year}
+                onChange={(e) => setYear(Number(e.target.value))}
+              >
+                <option value="">-- Chọn năm --</option>
+                {uniqueYears.map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
               </CFormSelect>
             </CCol>
 
-            <CCol md={6}>
+            <CCol md={3}>
             </CCol>
             <CCol md={3} className="d-flex align-items-end justify-content-end">
               <CButton color="success" onClick={exportPDF}>Xuất PDF</CButton>

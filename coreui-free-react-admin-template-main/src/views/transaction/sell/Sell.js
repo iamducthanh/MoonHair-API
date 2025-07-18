@@ -10,6 +10,7 @@ import { useAppContext } from '../../../context/AppContext';
 import employeeApi from '../../../api/employeeApi';
 import { toast } from 'react-toastify';
 import { useSearchParams } from 'react-router-dom';
+import dayjs from 'dayjs'
 
 export default function BanHangScreen() {
   const { selectedBranchLocal, setSelectedBranchLocal } = useAppContext();
@@ -18,15 +19,16 @@ export default function BanHangScreen() {
   const [danhSachDichVu, setDanhSachDichVu] = useState([])
   const [expandedProductId, setExpandedProductId] = useState([])
   const [giamGia, setGiamGia] = useState(0);
+  const [ngayBan, setNgayBan] = useState(dayjs().format('YYYY-MM-DDTHH:mm'))
   const [tenKhachHang, setTenKhachHang] = useState('');
   const [phuongThucThanhToan, setPhuongThucThanhToan] = useState('tienmat'); // 'tienmat' hoặc 'chuyenkhoan'
   const [dichVuDaChon, setDichVuDaChon] = useState([])
   const tongTien = dichVuDaChon.reduce((sum, sp) => sum + sp.soLuong * sp.donGia, 0)
-  const tongTienSauGiamGia = Math.max(tongTien - tongTien/100*giamGia, 0);
+  const tongTienSauGiamGia = Math.max(tongTien - tongTien / 100 * giamGia, 0);
   const [employees, setEmployees] = useState([]);
 
   const [searchParams] = useSearchParams();
-const maHoaDon = searchParams.get('maHoaDon');
+  const maHoaDon = searchParams.get('maHoaDon');
 
   useEffect(() => {
     // Gọi API lấy danh sách phiếu nhập hàng
@@ -50,7 +52,7 @@ const maHoaDon = searchParams.get('maHoaDon');
     try {
       const res = await sellApi.getInvoiceByMa(ma); // 👉 API trả về chi tiết hóa đơn
       const data = res.data;
-  
+
       const list = data.hoaDonChiTiets.map((item) => ({
         ...item,
         soLuong: item.soLuong,
@@ -60,7 +62,7 @@ const maHoaDon = searchParams.get('maHoaDon');
         thoChinh: '',
         thoPhu: ''
       }));
-  
+
       setDichVuDaChon(list);
       setTenKhachHang(data.tenKhachHang);
       setGiamGia(parseFloat(data.giamGia));
@@ -152,28 +154,39 @@ const maHoaDon = searchParams.get('maHoaDon');
     obj.tongTien = tongTien;
     obj.tongTienThanhToan = tongTienSauGiamGia;
     obj.idChiNhanh = selectedBranchLocal
-    obj.giamGia = tongTien/100*giamGia;
+    obj.giamGia = tongTien / 100 * giamGia;
     obj.tenKhachHang = tenKhachHang;
+    obj.ngayHoaDon = ngayBan
     console.log(obj)
-
-    try {
-      const sell = await sellApi.saveSell(obj);
-      if (obj.phuongThucThanhToan == 'chuyenkhoan') {
-        let idHoaDon = sell.data.idHoaDon
-        const res = await sellApi.paymentVnpay(sell.data.idHoaDon, sell.data.tongTienThanhToan);
-        window.open(res.data.url, '_blank');
-      } else {
+    let validate = true;
+    for (const product of obj.productList) {
+      if (!product.name || product.name.trim() === "") {
+        validate = false;
+        toast.error("Thông tin sản phẩm dịch vụ không được để trống!");
       }
-      // 👉 Reset sau khi lưu
-      toast.success("Thành công!");
-      resetForm();
-      fetchProduct();
-
-      console.log(sell);
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
     }
+
+    if (validate == true) {
+      try {
+        const sell = await sellApi.saveSell(obj);
+        if (obj.phuongThucThanhToan == 'chuyenkhoan') {
+          let idHoaDon = sell.data.idHoaDon
+          const res = await sellApi.paymentVnpay(sell.data.idHoaDon, sell.data.tongTienThanhToan);
+          window.open(res.data.url, '_blank');
+        } else {
+        }
+        // 👉 Reset sau khi lưu
+        toast.success("Thành công!");
+        resetForm();
+        fetchProduct();
+  
+        console.log(sell);
+      } catch (error) {
+        console.log(error);
+        toast.error(error.response.data.message);
+      }
+    }
+
 
 
   }
@@ -270,12 +283,12 @@ const maHoaDon = searchParams.get('maHoaDon');
               <CTableRow key={sp.id}>
                 <CTableDataCell>{idx + 1}</CTableDataCell>
                 <CTableDataCell>
-                  {sp.productCode !== 'SPM000' && (
+                  {true && (
                     <CFormInput
                       value={sp.name}
                       size="sm"
                       onChange={(e) => handleChange(idx, 'name', e.target.value)}
-                      placeholder="Nhập tên khách hàng"
+                      placeholder="Nhập sản phẩm/ dịch vụ"
                     />
                   )}
                 </CTableDataCell>
@@ -348,6 +361,16 @@ const maHoaDon = searchParams.get('maHoaDon');
             <CRow>
               <CCol md={12}>
                 <div className="text-end mt-3">
+                  <div className="mb-2 d-inline-block">
+                    <strong>Ngày bán: </strong>
+                    <CFormInput
+                      style={{ width: '250px', height: '40px', display: 'inline-block' }}
+                      type="datetime-local"
+                      value={ngayBan}
+                      onChange={(e) => setNgayBan(e.target.value)}
+                      required
+                    />
+                  </div> <br />
                   <div className="mb-2 d-inline-block">
                     <strong>Giảm giá (%): </strong>
                     <CFormInput

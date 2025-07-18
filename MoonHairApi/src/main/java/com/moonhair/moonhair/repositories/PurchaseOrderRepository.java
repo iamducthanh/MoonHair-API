@@ -14,7 +14,7 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrderEnti
     List<PurchaseOrderEntity> findAllByBranchId(Integer branchId);
 
     @Query("SELECT po, pod FROM PurchaseOrderEntity po " +
-            "LEFT JOIN PurchaseOrderDetailEntity pod ON po.id = pod.purchaseOrderId where po.branchId = ?1")
+            "LEFT JOIN PurchaseOrderDetailEntity pod ON po.id = pod.purchaseOrderId where po.branchId = ?1 order by po.createdAt desc")
     List<Object[]> findAllPurchaseOrdersWithDetails(Integer branchId);
 
 

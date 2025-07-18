@@ -31,11 +31,19 @@ const AccountingBookList = () => {
   const navigate = useNavigate();
   const [editStates, setEditStates] = useState({});
   const [employees, setEmployees] = useState([]);
+  const today = new Date()
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 2)
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+  const { perms } = useAppContext();
+  const hasPerm = (perm) => perms?.includes(perm);
+  const [billUpdate, setBillUpdate] = useState({});
+  const [statusUpdate, setStatusUpdate] = useState({});
 
+  const formatDate = (date) => date.toISOString().split("T")[0]
   const [filters, setFilters] = useState({
     isToday: true,
-    fromDate: "",
-    toDate: "",
+    fromDate: formatDate(firstDay),
+    toDate: formatDate(lastDay),
     trangThais: {
       hoanThanh: false,
       choChuyenKhoan: false,
@@ -112,7 +120,10 @@ const AccountingBookList = () => {
 
   const updateInvoiceStatus = async (maHoaDon, invoiceUpdate) => {
     try {
-      const res = await sellApi.updateInvoice(maHoaDon, invoiceUpdate);
+      let dataUpdate = {
+        trangThai: statusUpdate
+      }
+      const res = await sellApi.updateInvoice(maHoaDon, dataUpdate);
 
       console.log(res);
       if (res.status != 200) {
@@ -308,7 +319,7 @@ const AccountingBookList = () => {
                                       <div>
                                         <strong>Trạng thái:</strong>
                                         <CFormSelect
-                                          value={editStates[invoice.id].selectedTrangThai}
+                                          value={statusUpdate ? statusUpdate : "82"}
                                           onChange={(e) => {
                                             setEditStates((prev) => ({
                                               ...prev,
@@ -318,6 +329,7 @@ const AccountingBookList = () => {
                                               },
                                             }));
                                             setSellUpdate((prev) => ({ ...prev, thoChinh: e.target.value }))
+                                            setStatusUpdate(e.target.value)
                                           }
                                           }
                                           className="mt-2">
@@ -355,7 +367,7 @@ const AccountingBookList = () => {
                                           <div>
                                             <CFormSelect
                                               size="sm"
-                                              value={editStates[item.idHoaDonChiTiet] }
+                                              value={editStates[item.idHoaDonChiTiet]}
                                               onChange={(e) => {
                                                 setEditStates((prev) => ({
                                                   ...prev,
@@ -398,55 +410,57 @@ const AccountingBookList = () => {
                                   <p>Khách cần trả: <strong>{invoice.khachDaTra ? invoice.khachDaTra.toLocaleString() : ''}</strong></p>
                                   <p>Khách đã trả: <strong>{invoice.khachDaTra ? invoice.khachDaTra.toLocaleString() : ''}</strong></p>
                                 </div>
+                                {hasPerm('PERM_ADMIN') && (
+                                  <div className="d-flex justify-content-end gap-2 mt-3">
+                                    {editStates[invoice.id]?.isEdit ? (
+                                      <CButton
+                                        color="success"
+                                        onClick={() => {
+                                          const updatedStatus = editStates[invoice.id].selectedTrangThai;
+                                          console.log("Lưu trạng thái mới:", invoiceUpdate);
+                                          console.log("Lưu trạng thái mới:", invoice.maHoaDon);
+                                          updateInvoiceStatus(invoice.maHoaDon, invoiceUpdate);
+                                          setEditStates((prev) => ({
+                                            ...prev,
+                                            [invoice.id]: {
+                                              ...prev[invoice.id],
+                                              isEdit: false,
+                                            },
+                                          }));
+                                        }}
+                                      >
+                                        💾 Lưu thay đổi
+                                      </CButton>
+                                    ) : (
+                                      <CButton
+                                        color="warning"
+                                        onClick={() => {
+                                          setEditStates((prev) => ({
+                                            ...prev,
+                                            [invoice.id]: {
+                                              isEdit: true,
+                                              selectedTrangThai: invoice.status === 'Hoàn thành' ? '100' : '82',
+                                            },
+                                          }))
+                                          setInvoiceUpdate((prev) => ({ ...prev, trangThai: invoice.status === 'Hoàn thành' ? '100' : '82' }))
+                                          setBillUpdate(invoice.id)
+                                          setStatusUpdate(invoice.trangThaiCode)
+                                        }
+                                        }
+                                      >
+                                        ✏️ Cập nhật
+                                      </CButton>
 
-                                <div className="d-flex justify-content-end gap-2 mt-3">
-                                  {editStates[invoice.id]?.isEdit ? (
-                                    <CButton
-                                      color="success"
-                                      onClick={() => {
-                                        const updatedStatus = editStates[invoice.id].selectedTrangThai;
-                                        console.log("Lưu trạng thái mới:", invoiceUpdate);
-                                        console.log("Lưu trạng thái mới:", invoice.maHoaDon);
-                                        updateInvoiceStatus(invoice.maHoaDon, invoiceUpdate);
-                                        setEditStates((prev) => ({
-                                          ...prev,
-                                          [invoice.id]: {
-                                            ...prev[invoice.id],
-                                            isEdit: false,
-                                          },
-                                        }));
-                                      }}
-                                    >
-                                      💾 Lưu thay đổi
-                                    </CButton>
-                                  ) : (
-                                    <CButton
-                                      color="warning"
-                                      onClick={() => {
-                                        setEditStates((prev) => ({
-                                          ...prev,
-                                          [invoice.id]: {
-                                            isEdit: true,
-                                            selectedTrangThai: invoice.status === 'Hoàn thành' ? '100' : '82',
-                                          },
-                                        }))
-                                        setInvoiceUpdate((prev) => ({ ...prev, trangThai: invoice.status === 'Hoàn thành' ? '100' : '82' }))
-
-                                      }
-                                      }
-                                    >
-                                      ✏️ Cập nhật
-                                    </CButton>
-
-                                  )}
-                                  {/* <CButton
+                                    )}
+                                    {/* <CButton
                                     color="warning"
                                     onClick={() => handleCopyInvoice(invoice.maHoaDon)}
                                   >
                                     📋 Sao chép đơn
                                   </CButton> */}
-                                  <CButton color="danger" onClick={() => handleCancelInvoice(invoice.maHoaDon)}>❌ Hủy bỏ</CButton>
-                                </div>
+                                    <CButton color="danger" onClick={() => handleCancelInvoice(invoice.maHoaDon)}>❌ Hủy bỏ</CButton>
+                                  </div>
+                                )}
                               </CCardBody>
                             </CCard>
                           </CCollapse>

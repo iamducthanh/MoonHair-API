@@ -13,6 +13,7 @@ import productApi from '../../../api/productApi';
 import purchaseOrderApi from '../../../api/purchaseOrderApi';
 import { useAppContext } from '../../../context/AppContext';
 import { toast } from 'react-toastify';
+import dayjs from 'dayjs'
 
 const PurchaseOrderAdd = () => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ const PurchaseOrderAdd = () => {
     })
     const [keyword, setKeyword] = useState('');
     const [nhaCungCap, setNhaCungCap] = useState('')
-    const [ngayNhap, setNgayNhap] = useState(new Date().toISOString().slice(0, 16))
+    const [ngayNhap, setNgayNhap] = useState(dayjs().format('YYYY-MM-DDTHH:mm'))
     const tinhThanhTien = (sp) => sp.soLuongNhap * sp.donGia
     const tongTienHang = sanPham.reduce((total, sp) => total + tinhThanhTien(sp), 0)
     const [showDropdown, setShowDropdown] = useState(false);

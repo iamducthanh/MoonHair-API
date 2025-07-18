@@ -44,26 +44,13 @@ const WidgetsDropdown = (props) => {
           color="primary"
           value={
             <>
-              26K{' '}
+              {props.data ? props.data.todayRevenue.toLocaleString('vi-VN') + ' ₫' : 0}
               <span className="fs-6 fw-normal">
-                (-12.4% <CIcon icon={cilArrowBottom} />)
+                ({props.data ? props.data.percentChange: 0}% <CIcon icon={props.data && props.data.percentChange < 0 ? cilArrowBottom : cilArrowTop} />)
               </span>
             </>
           }
-          title="Users"
-          action={
-            <CDropdown alignment="end">
-              <CDropdownToggle color="transparent" caret={false} className="text-white p-0">
-                <CIcon icon={cilOptions} />
-              </CDropdownToggle>
-              <CDropdownMenu>
-                <CDropdownItem>Action</CDropdownItem>
-                <CDropdownItem>Another action</CDropdownItem>
-                <CDropdownItem>Something else here...</CDropdownItem>
-                <CDropdownItem disabled>Disabled action</CDropdownItem>
-              </CDropdownMenu>
-            </CDropdown>
-          }
+          title="Doanh thu hôm nay"
           chart={
             <CChartLine
               ref={widgetChartRef1}

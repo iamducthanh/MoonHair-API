@@ -122,6 +122,35 @@ ALTER TABLE chi_nhanh ADD COLUMN hoa_hong_phu int;
 ALTER TABLE hoa_don_chi_tiet ADD COLUMN hoa_hong_chinh int;
 ALTER TABLE hoa_don_chi_tiet ADD COLUMN hoa_hong_phu int;
 
+ALTER TABLE hoa_don ADD COLUMN ngay_hoa_don datetime;
+
+SELECT DISTINCT DATE_FORMAT(ngay_tao, '%m/%Y') AS thang
+FROM hoa_don
+WHERE ngay_tao IS NOT NULL
+ORDER BY ngay_tao DESC;
+
+ALTER TABLE nhan_vien ADD COLUMN roles varchar(100);
+
+    SELECT 
+        hdc.tho_chinh AS thoChinhId,
+        nv.ten AS tenTho,
+        SUM(hdc.thanh_tien) AS tongDoanhThu,
+        COUNT(DISTINCT hd.id) AS soHoaDon,
+        COUNT(*) AS soLuongDichVu,
+        ROUND(SUM(hdc.thanh_tien) / COUNT(DISTINCT hd.id), 2) AS doanhThuTrungBinh
+    FROM hoa_don_chi_tiet hdc
+    JOIN hoa_don hd ON hd.id = hdc.hoa_don_id
+    JOIN nhan_vien nv ON nv.id = hdc.tho_chinh
+    WHERE MONTH(hd.ngay_hoa_don) = MONTH(CURDATE())
+      AND YEAR(hd.ngay_hoa_don) = YEAR(CURDATE())
+    GROUP BY hdc.tho_chinh, nv.ten
+    ORDER BY tongDoanhThu DESC
+    LIMIT 5
+
+
+
+
+
 
 
 

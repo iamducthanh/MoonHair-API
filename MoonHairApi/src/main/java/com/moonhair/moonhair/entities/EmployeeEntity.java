@@ -46,4 +46,6 @@ public class EmployeeEntity {
 
     @Column(name = "loai")
     private String type;
+
+    private String roles;
 }

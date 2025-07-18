@@ -12,6 +12,7 @@ import java.util.List;
 public class Sell {
     private Long idHoaDon;
     private String phuongThucThanhToan;
+    private String ngayHoaDon;
     private Double tongTien;
     private Double tongTienThanhToan;
     private Double giamGia;

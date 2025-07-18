@@ -24,6 +24,9 @@ const sellApi = {
     },
     getInvoiceByMa(maHoaDon) {
         return axiosClient.get(`/api/sell/hoa-don/${maHoaDon}`);
+    },
+    getThangNam() {
+        return axiosClient.get(`/api/sell/thang-nam`);
     }
 };
 

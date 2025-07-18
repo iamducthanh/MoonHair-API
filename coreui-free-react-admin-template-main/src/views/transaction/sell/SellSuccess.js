@@ -27,7 +27,7 @@ export default function PaymentResultScreen() {
     sellApi.paymentResult(queryString)
 
     const handleBack = () => {
-        navigate('/ban-hang') // hoặc trang bạn muốn về
+        navigate('/transaction/sell') // hoặc trang bạn muốn về
     }
 
     return (

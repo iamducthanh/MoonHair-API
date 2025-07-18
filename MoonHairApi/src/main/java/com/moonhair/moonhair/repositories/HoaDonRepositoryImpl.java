@@ -35,10 +35,10 @@ public class HoaDonRepositoryImpl implements HoaDonRepositoryCustom {
         }
 
         if (request.getIsToday() != null && request.getIsToday()) {
-            sql.append(" AND DATE(h.ngayTao) = :getDate");
+            sql.append(" AND DATE(h.ngayHoaDon) = :getDate");
             params.put("getDate", LocalDate.now());
         } else if (request.getFromDate() != null && !request.getFromDate().isEmpty() && request.getToDate() != null && !request.getToDate().isEmpty()) {
-            sql.append(" AND DATE(h.ngayTao) BETWEEN :fromDate AND :toDate");
+            sql.append(" AND DATE(h.ngayHoaDon) BETWEEN :fromDate AND :toDate");
             params.put("fromDate", LocalDate.parse(request.getFromDate(), formatter));
             params.put("toDate", LocalDate.parse(request.getToDate(), formatter));
         }

@@ -118,9 +118,9 @@ const ProductSetting = () => {
     }
 
     const handleSubmitAddProduct = async () => {
-        if (!validateForm()) {
-            return; // có lỗi thì không gọi API
-        }
+        // if (!validateForm()) {
+        //     return; // có lỗi thì không gọi API
+        // }
         await productApi.createProduct(formProductAdd)
         setVisible(false)
         fetchProducts();

@@ -13,11 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
@@ -70,6 +68,7 @@ public class SellServiceImpl implements ISellService {
                 .ghiChuThanhToan(ghiChuThanhToan)
                 .idChiNhanh(sell.getIdChiNhanh())
                 .nguoiTaoDon(userId)
+                .ngayHoaDon(LocalDateTime.parse(sell.getNgayHoaDon()))
                 .build();
 
         HoaDonEntity hoaDon = hoaDonRepository.save(hoaDonEntity);
@@ -111,15 +110,19 @@ public class SellServiceImpl implements ISellService {
                 }
             }
             if (o.getProductType() == null) {
+                Integer hoaHongKyc = 0;
+                if (o.getKyc() != null && o.getKyc()) {
+                    hoaHongKyc = 30;
+                }
                 if (emPhu == null && emChinh != null) {
-                    hoaDonChiTietEntity.setHoaHongChinh(Integer.parseInt(emChinh.getSalaryRate()) + branchEntity.getHoaHongPhu());
+                    hoaDonChiTietEntity.setHoaHongChinh((hoaHongKyc == 0 ? Integer.parseInt(emChinh.getSalaryRate()) : hoaHongKyc) + branchEntity.getHoaHongPhu());
                     hoaDonChiTietEntity.setHoaHongPhu(0);
                 } else if (emPhu != null && emChinh == null) {
-                    hoaDonChiTietEntity.setHoaHongPhu(Integer.parseInt(emPhu.getSalaryRate()) + branchEntity.getHoaHongChinh());
+                    hoaDonChiTietEntity.setHoaHongPhu(Integer.parseInt(emPhu.getSalaryRate()) + (hoaHongKyc == 0 ? branchEntity.getHoaHongChinh() : hoaHongKyc));
                     hoaDonChiTietEntity.setHoaHongChinh(0);
                 } else if (emChinh != null) {
                     hoaDonChiTietEntity.setHoaHongPhu(Integer.parseInt(emPhu.getSalaryRate()));
-                    hoaDonChiTietEntity.setHoaHongChinh(Integer.parseInt(emChinh.getSalaryRate()));
+                    hoaDonChiTietEntity.setHoaHongChinh(hoaHongKyc == 0 ? Integer.parseInt(emChinh.getSalaryRate()) : hoaHongKyc);
                 }
             } else if (o.getProductType().equals("SAN_PHAM")) {
                 if (emChinh != null) {
@@ -163,7 +166,25 @@ public class SellServiceImpl implements ISellService {
     @Override
     public List<HoaDon> getSellList(SellFilterRequest dto) {
         List<HoaDonEntity> entities = hoaDonRepository.findByFilter(dto);
+        entities.sort(Comparator.comparing(HoaDonEntity::getNgayHoaDon).reversed());
         return hoaDonEntityToDto(entities);
+    }
+
+    @Override
+    public List<Map<String, Integer>> getDistinctMonthAndYear() {
+        List<Object[]> raw = hoaDonRepository.findDistinctMonthAndYear();
+        List<Map<String, Integer>> result = new ArrayList<>();
+
+        for (Object[] row : raw) {
+            Integer year = (Integer) row[0];
+            Integer month = (Integer) row[1];
+            Map<String, Integer> map = new HashMap<>();
+            map.put("month", month);
+            map.put("year", year);
+            result.add(map);
+        }
+
+        return result;
     }
 
     @Override
@@ -190,7 +211,7 @@ public class SellServiceImpl implements ISellService {
     }
 
     public List<HoaDon> hoaDonEntityToDto (List<HoaDonEntity> hoaDonList) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
         AtomicReference<BigDecimal> tongDoanhThu = new AtomicReference<>(BigDecimal.ZERO);
         AtomicReference<BigDecimal> tongTienMat = new AtomicReference<>(BigDecimal.ZERO);
@@ -201,11 +222,12 @@ public class SellServiceImpl implements ISellService {
             HoaDon hoaDon = HoaDon.builder()
                     .maHoaDon(o.getMaHoaDon())
                     .tenKhachHang(o.getTenKhach())
-                    .thoiGian(o.getNgayTao().format(formatter))
+                    .thoiGian(o.getNgayHoaDon().format(formatter))
                     .tongTien(o.getTongTien())
                     .giamGia(o.getGiamGia())
                     .khachDaTra(o.getTongTienThanhToan())
                     .trangThai(o.getGhiChuThanhToan())
+                    .trangThaiCode(o.getTrangThaiThanhToan())
                     .chiNhanh(o.getIdChiNhanh().toString())
                     .maChiNhanh(o.getIdChiNhanh())
                     .nguoiTao(o.getNguoiTaoDon())

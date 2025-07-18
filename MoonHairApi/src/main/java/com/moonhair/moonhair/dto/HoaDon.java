@@ -22,6 +22,7 @@ public class HoaDon {
     private BigDecimal giamGia;
     private BigDecimal khachDaTra;
     private String trangThai;
+    private String trangThaiCode;
     private String chiNhanh;
     private Long maChiNhanh;
     private String nguoiTao;
