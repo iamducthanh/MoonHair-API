@@ -147,7 +147,166 @@ ALTER TABLE nhan_vien ADD COLUMN roles varchar(100);
     ORDER BY tongDoanhThu DESC
     LIMIT 5
 
+-- moonhair.chi_nhanh definition
 
+CREATE TABLE `chi_nhanh` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ten` varchar(255) NOT NULL,
+  `dia_chi` text NOT NULL,
+  `active` bit(1) DEFAULT NULL,
+  `hoa_hong_chinh` int DEFAULT NULL,
+  `hoa_hong_phu` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- moonhair.hoa_don definition
+
+CREATE TABLE `hoa_don` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `ten_khach` varchar(255) DEFAULT NULL,
+  `tong_tien` decimal(15,2) DEFAULT NULL,
+  `giam_gia` decimal(15,2) DEFAULT NULL,
+  `tong_tien_thanh_toan` decimal(15,2) DEFAULT NULL,
+  `phuong_thuc` varchar(100) DEFAULT NULL,
+  `id_chi_nhanh` int NOT NULL,
+  `trang_thai_thanh_toan` varchar(10) DEFAULT NULL,
+  `ghi_chu_thanh_toan` varchar(200) DEFAULT NULL,
+  `nguoi_tao_don` varchar(20) DEFAULT NULL,
+  `ma_hoa_don` varchar(10) DEFAULT NULL,
+  `ngay_tao` datetime DEFAULT NULL,
+  `ngay_sua` datetime DEFAULT NULL,
+  `is_delete` bit(1) DEFAULT NULL,
+  `ngay_hoa_don` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- moonhair.loai_san_pham definition
+
+CREATE TABLE `loai_san_pham` (
+  `code` varchar(255) NOT NULL,
+  `ten` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- moonhair.phieu_nhap definition
+
+CREATE TABLE `phieu_nhap` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ma_phieu` varchar(255) DEFAULT NULL,
+  `id_chi_nhanh` int NOT NULL,
+  `ngay_tao` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `ten_ncc` varchar(255) DEFAULT NULL,
+  `trang_thai` varchar(10) DEFAULT NULL,
+  `tong_tien` double DEFAULT NULL,
+  `giam_gia` double DEFAULT NULL,
+  `tong_tien_thanh_toan` double DEFAULT NULL,
+  `chi_phi_khac` double DEFAULT NULL,
+  `ghi_chu` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- moonhair.hoa_don_chi_tiet definition
+
+CREATE TABLE `hoa_don_chi_tiet` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `ten_khach_san_pham` varchar(255) DEFAULT NULL,
+  `tho_chinh` varchar(255) DEFAULT NULL,
+  `tho_phu` varchar(255) DEFAULT NULL,
+  `so_luong` int DEFAULT NULL,
+  `khach_yc` text,
+  `don_gia` decimal(15,2) DEFAULT NULL,
+  `thanh_tien` decimal(15,2) DEFAULT NULL,
+  `hoa_don_id` bigint DEFAULT NULL,
+  `loai` varchar(10) DEFAULT NULL,
+  `tho_chinh_ten` varchar(100) DEFAULT NULL,
+  `tho_phu_ten` varchar(100) DEFAULT NULL,
+  `ma_san_pham` varchar(10) DEFAULT NULL,
+  `hoa_hong_chinh` int DEFAULT NULL,
+  `hoa_hong_phu` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `hoa_don_id` (`hoa_don_id`),
+  CONSTRAINT `hoa_don_chi_tiet_ibfk_1` FOREIGN KEY (`hoa_don_id`) REFERENCES `hoa_don` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- moonhair.nhan_vien definition
+
+CREATE TABLE `nhan_vien` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ten` varchar(255) NOT NULL,
+  `muc_luong` int NOT NULL,
+  `id_chi_nhanh` int DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `ngay_tao` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `ngay_sua` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `ten_dang_nhap` varchar(100) DEFAULT NULL,
+  `mat_khau` varchar(200) DEFAULT NULL,
+  `loai` varchar(10) DEFAULT NULL,
+  `roles` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_chi_nhanh` (`id_chi_nhanh`),
+  CONSTRAINT `nhan_vien_ibfk_1` FOREIGN KEY (`id_chi_nhanh`) REFERENCES `chi_nhanh` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1008 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- moonhair.san_pham definition
+
+CREATE TABLE `san_pham` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `ten` varchar(255) NOT NULL,
+  `gia_ban` double DEFAULT NULL,
+  `loai` varchar(255) DEFAULT NULL,
+  `ngay_tao` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `ngay_sua` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `delete_flag` tinyint(1) NOT NULL DEFAULT '1',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `id_chi_nhanh` int NOT NULL,
+  `kich_thuoc` varchar(100) DEFAULT NULL,
+  `ghi_chu` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_chi_nhanh` (`id_chi_nhanh`),
+  CONSTRAINT `san_pham_ibfk_1` FOREIGN KEY (`id_chi_nhanh`) REFERENCES `chi_nhanh` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- moonhair.chi_tiet_phieu_nhap definition
+
+CREATE TABLE `chi_tiet_phieu_nhap` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_phieu_nhap` int NOT NULL,
+  `id_san_pham` int NOT NULL,
+  `so_luong` int NOT NULL,
+  `gia_nhap` decimal(15,2) NOT NULL,
+  `ten_san_pham` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_ctpn_phieunhap` (`id_phieu_nhap`),
+  KEY `fk_ctpn_sanpham` (`id_san_pham`),
+  CONSTRAINT `fk_ctpn_phieunhap` FOREIGN KEY (`id_phieu_nhap`) REFERENCES `phieu_nhap` (`id`),
+  CONSTRAINT `fk_ctpn_sanpham` FOREIGN KEY (`id_san_pham`) REFERENCES `san_pham` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- moonhair.lo_hang definition
+
+CREATE TABLE `lo_hang` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_san_pham` int NOT NULL,
+  `id_chi_tiet_phieu_nhap` int DEFAULT NULL,
+  `ma_lo` varchar(100) NOT NULL,
+  `so_luong_nhap` int NOT NULL,
+  `so_luong_con` int NOT NULL,
+  `gia_von` decimal(15,2) NOT NULL,
+  `gia_ban` decimal(15,2) NOT NULL,
+  `ngay_nhap` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_lo_sanpham` (`id_san_pham`),
+  KEY `fk_lo_ctpn` (`id_chi_tiet_phieu_nhap`),
+  CONSTRAINT `fk_lo_ctpn` FOREIGN KEY (`id_chi_tiet_phieu_nhap`) REFERENCES `chi_tiet_phieu_nhap` (`id`),
+  CONSTRAINT `fk_lo_sanpham` FOREIGN KEY (`id_san_pham`) REFERENCES `san_pham` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 
